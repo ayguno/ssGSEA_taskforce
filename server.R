@@ -13,12 +13,14 @@ server<-function(input, output, session) {
         
         global.values <- reactiveValues(task = NULL)
         
-        
+        observe(
+        if(is.null(global.values$task)){
         output$mainbody <- renderUI(
                 box(title="Welcome to ssGSEA taskforce!",status = "primary", 
                     background = "navy",width = 12,height = "100%",
                     h4(column(3,{}),"Do you want to run ssGSEA or analyze existing ssGSEA results?")
                     )
+        )}
         )
        
         
