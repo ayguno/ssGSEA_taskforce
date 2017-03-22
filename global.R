@@ -26,6 +26,7 @@ library(ape)
 library(ggrepel)
 
 source("pheatmap.r")
+source("ssGSEA.R")
 
 require(grid)
 require(gtable)
