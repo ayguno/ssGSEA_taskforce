@@ -11,7 +11,10 @@ server<-function(input, output, session) {
         # Reactive values to store and access across a session
         #######################################################################
         
-        global.values <- reactiveValues(task = NULL)
+        global.values <- reactiveValues(task = NULL,results.gct = NULL,
+                                        fdr.gct = NULL)
+        
+        global.errors <- reactiveValues(analysis.step1 = NULL)
         
         
         ######################################################################
@@ -61,6 +64,10 @@ server<-function(input, output, session) {
         # Task : analyze.GSEA
         ######################################################################
         
+        #################################
+        # UI definition for analyze.GSEA
+        #################################
+        
         # Box link for analyze.GSEA
         output$analyze.GSEA.box <-renderUI({
                 valueBox(value="Analyze ssGSEA",color = "blue", icon = icon("line-chart"),
@@ -74,12 +81,89 @@ server<-function(input, output, session) {
                         
                         box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
                             background = "navy", width = 12, height = "100%",
-                            h3("Step1: Load your data")
+                            h3("Step1: Load your data"), br(),
+                            fileInput(inputId = "results.gct",width = '400px',
+                                      label = "Select to upload your results.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
+                            fileInput(inputId = "fdr.gct",width = '400px',
+                                      label = "Select to upload your Results-fdr-pvalues.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct")
                         )
+                        
+                        
                         
                 )# End of renderUI 
                 
         })# End of link_to_analyze.GSEA observer 
         
+        ######################
+        # In the case of error
+        ######################
+        observeEvent(global.errors$analysis.step1,
+        if(global.errors$analysis.step1 == "error"){
+        output$mainbody <- renderUI(
+
+                        box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
+                            background = "navy", width = 12, height = "100%",
+                            h3("Step1: Load your data"), br(), 
+                            fileInput(inputId = "results.gct",width = '400px',
+                                      label = "Select to upload your results.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
+                            fileInput(inputId = "fdr.gct",width = '400px',
+                                      label = "Select to upload your Results-fdr-pvalues.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
+                            box(title = "Error", status = "danger",
+                                background = "navy", width = 12,height = "100%",
+                                h2("Your files are not suitable for the analysis, please correct them and reload")
+                            )
+                        )
+                        
+                        
+                              
+               )# End of renderUI
+           }
+        )# End of analysis.step1.error observer
+        
+        ######################################
+        # Actual computation for analyze.GSEA
+        ######################################
+        
+        # Extract data from results and fdr files
+        observe(
+       
+        # Read results.gct and fdr.gct
+        if(!is.null(input$results.gct) & !is.null(input$fdr.gct) ){ 
+                cat("Is it working here?")
+        # First check the files to decide if they are readable        
+        line.gct <- length(readLines(input$results.gct$datapath))        
+        line.fdr <- length(readLines(input$fdr.gct$datapath))
+        if(line.gct < 4 | line.fdr < 4){
+                global.errors$analysis.step1 = "error"       
+        }
+        else{
+        
+         results.gct <<- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
+                                   urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
+         
+         fdr.gct <<- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
+                                    urls= MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$descs)
+         
+        #Update the global if not null
+        if(!is.null(results.gct) | !is.null(fdr.gct) ) {
+                global.values$results.gct <- results.gct
+                global.values$fdr.gct <- fdr.gct
+                }
+            }
+        }
+        
+        )
+        
+        # Initiate the ui change to Step2 
+        
+        # Compute the plots/heatmaps required for the analysis 
         
 }# End of server        
