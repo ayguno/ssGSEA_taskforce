@@ -11,7 +11,9 @@ server<-function(input, output, session) {
         # Reactive values to store and access across a session
         #######################################################################
         
-        global.values <- reactiveValues(task = NULL,results.gct = NULL,
+        global.values <- reactiveValues(task = NULL,
+                                        results.gct = NULL,
+                                        p.values.gct = NULL,
                                         fdr.gct = NULL)
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
@@ -32,6 +34,18 @@ server<-function(input, output, session) {
                     actionLink("link_to_analyze.GSEA",label = uiOutput("analyze.GSEA.box",width = 4))
                     )
         )# End of renderUI
+        
+        output$sidebar <- renderUI(
+                
+                sidebarMenu(id="tabitems",  
+                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
+                            
+                            
+                )#End of sidebarMenu
+        )# End of renderUI
+        
+        
         }
         )
        
@@ -57,6 +71,16 @@ server<-function(input, output, session) {
                         
                 )# End of renderUI 
                 
+                output$sidebar <- renderUI(
+                        
+                        sidebarMenu(id="tabitems",  
+                                    h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
+                                    
+                                    
+                        )#End of sidebarMenu
+                )# End of renderUI
+                
         })# End of link_to_run.GSEA observer                   
         
         
@@ -67,6 +91,12 @@ server<-function(input, output, session) {
         #################################
         # UI definition for analyze.GSEA
         #################################
+        
+        #############
+        # 
+        #  STEP1
+        #
+        #############
         
         # Box link for analyze.GSEA
         output$analyze.GSEA.box <-renderUI({
@@ -86,6 +116,10 @@ server<-function(input, output, session) {
                                       label = "Select to upload your results.gct file",
                                       multiple = FALSE,
                                       accept = ".gct"),
+                            fileInput(inputId = "p.values.gct",width = '400px',
+                                      label = "Select to upload your pvalues.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
                             fileInput(inputId = "fdr.gct",width = '400px',
                                       label = "Select to upload your Results-fdr-pvalues.gct file",
                                       multiple = FALSE,
@@ -95,6 +129,17 @@ server<-function(input, output, session) {
                         
                         
                 )# End of renderUI 
+                
+                output$sidebar <- renderUI(
+                        
+                        sidebarMenu(id="tabitems",  
+                                    h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
+                                    
+                                    
+                        )#End of sidebarMenu
+                )# End of renderUI
+                
                 
         })# End of link_to_analyze.GSEA observer 
         
@@ -112,6 +157,10 @@ server<-function(input, output, session) {
                                       label = "Select to upload your results.gct file",
                                       multiple = FALSE,
                                       accept = ".gct"),
+                            fileInput(inputId = "p.values.gct",width = '400px',
+                                      label = "Select to upload your pvalues.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
                             fileInput(inputId = "fdr.gct",width = '400px',
                                       label = "Select to upload your Results-fdr-pvalues.gct file",
                                       multiple = FALSE,
@@ -125,8 +174,54 @@ server<-function(input, output, session) {
                         
                               
                )# End of renderUI
+        
+        
+        output$sidebar <- renderUI(
+                
+                sidebarMenu(id="tabitems",  
+                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
+                            
+                            
+                )#End of sidebarMenu
+        )# End of renderUI
+        
+        
            }
         )# End of analysis.step1.error observer
+        
+        
+        #############
+        # 
+        #  STEP2
+        #
+        #############
+        
+        observeEvent(global.values$task,
+                if(global.values$task == "analyze.GSEA.step2" ){
+                        output$mainbody <- renderUI(
+                                box(title="Analyze your ssGSEA data",status = "primary", 
+                                    background = "navy",width = 12,height = "100%",
+                                    h3("Step2: Explore your ssGSEA data by using different tools")
+                                    
+                                )
+                                
+                        )# End of renderUI
+                        
+                        output$sidebar <- renderUI(
+                                
+                                sidebarMenu(id="tabitems",  
+                                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),
+                                            menuItem("GSEA plot", tabName = "GSEAplot"),
+                                            menuItem("GSEA heatmap", tabName = "GSEAheatmap")
+                                            
+                                )#End of sidebarMenu
+                        )# End of renderUI
+                        
+                }
+        )
+        
         
         ######################################
         # Actual computation for analyze.GSEA
@@ -136,12 +231,13 @@ server<-function(input, output, session) {
         observe(
        
         # Read results.gct and fdr.gct
-        if(!is.null(input$results.gct) & !is.null(input$fdr.gct) ){ 
-                cat("Is it working here?")
+        if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) ){ 
+                
         # First check the files to decide if they are readable        
-        line.gct <- length(readLines(input$results.gct$datapath))        
+        line.gct <- length(readLines(input$results.gct$datapath)) 
+        line.p.values <- length(readLines(input$p.values.gct$datapath))
         line.fdr <- length(readLines(input$fdr.gct$datapath))
-        if(line.gct < 4 | line.fdr < 4){
+        if(line.gct < 4 | line.fdr < 4 | line.p.values < 4){
                 global.errors$analysis.step1 = "error"       
         }
         else{
@@ -149,20 +245,29 @@ server<-function(input, output, session) {
          results.gct <<- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
                                    urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
          
+         p.values.gct <<- data.frame(MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$ds,
+                                    urls= MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$descs)
+         
          fdr.gct <<- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
                                     urls= MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$descs)
          
         #Update the global if not null
-        if(!is.null(results.gct) | !is.null(fdr.gct) ) {
+        if(!is.null(results.gct) | !is.null(fdr.gct) | !is.null(p.values.gct) ) {
                 global.values$results.gct <- results.gct
+                global.values$p.values.gct <- p.values.gct
                 global.values$fdr.gct <- fdr.gct
+                
+                # Move to the next step once file upload is complete
+                global.values$task = "analyze.GSEA.step2"
                 }
             }
         }
         
         )
         
-        # Initiate the ui change to Step2 
+        # When files make sense, Initiate the ui change to Step2 
+        
+        
         
         # Compute the plots/heatmaps required for the analysis 
         

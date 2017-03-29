@@ -13,12 +13,8 @@ shinyUI( dashboardPage(skin = "red",
    ########################################################################
    
    dashboardSidebar(
-           sidebarMenu(id="tabitems",  
-                       h5(column(1,{}),icon("power-off"),"Powered by:"),
-                       tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
-                       
-                       
-           )#End of sidebarMenu
+          
+           uiOutput("sidebar")
            
    ),#End of dashboardSidebar
    
