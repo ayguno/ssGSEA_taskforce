@@ -200,7 +200,7 @@ server<-function(input, output, session) {
         observeEvent(global.values$task,
                 if(global.values$task == "analyze.GSEA.step2" ){
                         output$mainbody <- renderUI(
-                                dashboardBody(
+                               
                                         tabItems(
                                                         # analyze tab
                                                         tabItem(tabName = "analyze", class = "active",
@@ -212,15 +212,17 @@ server<-function(input, output, session) {
                                                                 )
                                                         ),# End of analyze tab
                                                         
+                                                        # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
                                                                 h5("GSEAplot will be here!")
                                                         ),# End of GSEAplot tab
                                                         
+                                                        # GSEAheatmap tab
                                                         tabItem(tabName = "GSEAheatmap", 
                                                                 h5("GSEAheatmap will be here!")
                                                         )# End of GSEAheatmap tab 
                                                 )
-                                        )
+                                        
                         )# End of renderUI
                         
                         output$sidebar <- renderUI(
@@ -236,36 +238,43 @@ server<-function(input, output, session) {
                                         )#End of sidebarMenu
                                 
                         )# End of renderUI
+                    
+                        # Box link for GSEAplot
+                        output$GSEAplot.box <-renderUI({
+                                valueBox(value="Generate GSEA plots",color = "blue", icon = icon("line-chart"),
+                                         subtitle = "Click here")
+                        })
                         
+                        
+                        observeEvent(input$link_to_GSEAplot, {
+                                newvalue <- "GSEAplot"
+                                updateTabsetPanel(session, "tabitems",selected= newvalue)
+                        })
+                        
+                        
+                        # Box link for GSEAheatmap
+                        output$GSEAheatmap.box <-renderUI({
+                                valueBox(value="Generate GSEA heatmaps",color = "blue", icon = icon("line-chart"),
+                                         subtitle = "Click here")
+                        })
+                        
+                        observeEvent(input$link_to_GSEAheatmap, {
+                                newvalue <- "GSEAheatmap"
+                                updateTabsetPanel(session, "tabitems",selected= newvalue)
+                        })
+                            
                 }
-        )
+        )# End of analyze.GSEA.step2 observer
         
 
-        # Box link for GSEAplot
-        output$GSEAplot.box <-renderUI({
-                valueBox(value="Generate GSEA plots",color = "blue", icon = icon("line-chart"),
-                         subtitle = "Click here")
-        })
-
         
-        # Box link for GSEAheatmap
-        output$GSEAheatmap.box <-renderUI({
-                valueBox(value="Generate GSEA heatmaps",color = "blue", icon = icon("line-chart"),
-                         subtitle = "Click here")
-        })
-        
-       
-        
-        
-        
-        
-        
-        
-        
-        
-        ######################################
+        #######################################
+        #
+        #
         # Actual computation for analyze.GSEA
-        ######################################
+        #
+        #
+        #######################################
         
         # Extract data from results and fdr files
         observe(
@@ -297,6 +306,7 @@ server<-function(input, output, session) {
                 global.values$p.values.gct <- p.values.gct
                 global.values$fdr.gct <- fdr.gct
                 
+                # When files make sense, Initiate the ui change to Step2 
                 # Move to the next step once file upload is complete
                 global.values$task = "analyze.GSEA.step2"
                 }
@@ -305,10 +315,8 @@ server<-function(input, output, session) {
         
         )
         
-        # When files make sense, Initiate the ui change to Step2 
-        
-        
-        
         # Compute the plots/heatmaps required for the analysis 
+        
+        
         
 }# End of server        
