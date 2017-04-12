@@ -191,93 +191,62 @@ server<-function(input, output, session) {
         )# End of analysis.step1.error observer
         
         
-        #############
+        ####################################
         # 
-        #  STEP2
+        #  STEP2: GSEAplot and GSEAheatmap
         #
-        #############
+        ####################################
         
         observeEvent(global.values$task,
                 if(global.values$task == "analyze.GSEA.step2" ){
                         output$mainbody <- renderUI(
-                                box(title="Analyze your ssGSEA data",status = "primary", 
-                                    background = "navy",width = 12,height = "100%",
-                                    h3("Step2: Explore your ssGSEA data by using different tools"),
-                                    actionLink("link_to_GSEAplot",label = uiOutput("GSEAplot.box",width = 4)),
-                                    actionLink("link_to_GSEAheatmap",label = uiOutput("GSEAheatmap.box",width = 4))
-                                )
-                                
+                                dashboardBody(
+                                        tabItems(
+                                                        # analyze tab
+                                                        tabItem(tabName = "analyze", class = "active",
+                                                        box(title="Analyze your ssGSEA data",status = "primary", 
+                                                            background = "navy",width = 12,height = "100%",
+                                                            h3("Step2: Explore your ssGSEA data by using different tools"),
+                                                            actionLink("link_to_GSEAplot",label = uiOutput("GSEAplot.box",width = 4)),
+                                                            actionLink("link_to_GSEAheatmap",label = uiOutput("GSEAheatmap.box",width = 4))
+                                                                )
+                                                        ),# End of analyze tab
+                                                        
+                                                        tabItem(tabName = "GSEAplot", 
+                                                                h5("GSEAplot will be here!")
+                                                        ),# End of GSEAplot tab
+                                                        
+                                                        tabItem(tabName = "GSEAheatmap", 
+                                                                h5("GSEAheatmap will be here!")
+                                                        )# End of GSEAheatmap tab 
+                                                )
+                                        )
                         )# End of renderUI
                         
                         output$sidebar <- renderUI(
                                 
                                 sidebarMenu(id="tabitems",  
                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )
+                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
+                                            menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
+                                            menuItem("GSEA plot", tabName = "GSEAplot"),
+                                            menuItem("GSEA heatmap", tabName = "GSEAheatmap")
                                             
                                             
-                                )#End of sidebarMenu
+                                        )#End of sidebarMenu
+                                
                         )# End of renderUI
                         
                 }
         )
         
-        
-        #####################
-        # 
-        #  STEP3a: GSEAplot
-        #
-        #####################
-        
+
         # Box link for GSEAplot
         output$GSEAplot.box <-renderUI({
                 valueBox(value="Generate GSEA plots",color = "blue", icon = icon("line-chart"),
                          subtitle = "Click here")
         })
-        
-        # Actual observer for GSEAplot
-        observeEvent(input$link_to_GSEAplot, {
-                global.values$task = "GSEAplot"
-                output$mainbody <- renderUI(
-                        
-                        dashboardBody(
-                                
-                                tabItem(tabName = "GSEAplot", 
-                                        
-                                        h5("GSEAplot will be here!")
-                                        
-                                        )
-                                
-                        )
-                        
-                        
-                        
-                )# End of renderUI 
-                
-                # Side bar for GSEAplot
-                output$sidebar <- renderUI(
-                        
-                        sidebarMenu(id="tabitems",  
-                                    h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),
-                                    menuItem("GSEA plot", tabName = "GSEAplot"),
-                                    menuItem("GSEA heatmap", tabName = "GSEAheatmap")
-                                    
-                        )#End of sidebarMenu
-                )# End of renderUI
-                
-                
-        })# End of link_to_GSEAplot observer
-        
-        
-        
-        
-        
-        #####################
-        # 
-        #  STEP3b: GSEAheatmap
-        #
-        #####################
+
         
         # Box link for GSEAheatmap
         output$GSEAheatmap.box <-renderUI({
@@ -285,40 +254,7 @@ server<-function(input, output, session) {
                          subtitle = "Click here")
         })
         
-        # Actual observer for GSEAheatmap
-        observeEvent(input$link_to_GSEAheatmap, {
-                global.values$task = "GSEAheatmap"
-                output$mainbody <- renderUI(
-                        
-                        dashboardBody(
-                                
-                                tabItem(tabName = "GSEAheatmap", 
-                                        
-                                        h5("GSEAheatmap will be here!")
-                                        
-                                )
-                                
-                        )
-                        
-                        
-                        
-                )# End of renderUI 
-                
-                # Side bar for GSEAheatmap
-                output$sidebar <- renderUI(
-                        
-                        sidebarMenu(id="tabitems",  
-                                    h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),
-                                    menuItem("GSEA plot", tabName = "GSEAplot"),
-                                    menuItem("GSEA heatmap", tabName = "GSEAheatmap")
-                                    
-                        )#End of sidebarMenu
-                )# End of renderUI
-                
-                
-        })# End of link_to_GSEAplot observer
-        
+       
         
         
         
