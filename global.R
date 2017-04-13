@@ -31,3 +31,11 @@ source("ssGSEA.R")
 require(grid)
 require(gtable)
 require(scales)
+
+# Read the available gene set database
+
+gmt <- dir(pattern = ".gmt")
+if(length(gmt == 1)){
+geneset <- strsplit(readLines(gmt)," ")
+}else
+warning("No or multiple gene sets.")        
