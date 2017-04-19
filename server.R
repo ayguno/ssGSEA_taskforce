@@ -360,8 +360,8 @@ server<-function(input, output, session) {
                                                       FDR = fdr.gct[gene.set.index,feature.index]
                         )
                         feature.name <- names(input.gct)[1]
-                        
-                        generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                       # plot(1:10,1:10) it doesn't plot anything in the ui
+                       generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
                 })
         
          })
