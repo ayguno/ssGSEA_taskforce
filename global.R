@@ -78,10 +78,47 @@ y.neg <- y[y<0]
 
 plot(x, y, type='l', ylab= "Expression ratio",axes=F, xlab='Rank',
      main = paste0("ssGSEA feature plot for ",feature.name),
-     xlim=c(1, length(x)))
-axis(2, las=2)
-axis(1, cex=.9, at=seq(0, length(x), 1e3))
+     xlim=c(1, length(x)), lwd = 2)
+axis(2, las=2, lwd = 2)
+axis(1, cex=.9, at=seq(0, length(x), 1e3), lwd = 2)
 polygon(c(x.pos, 1),c(y.pos,0), col='red')
 polygon(c(x.neg, length(x)),c(y.neg,0), col='blue')
+legend('topright', 
+       legend=c(paste('upregulated (n=', length(y.pos),')', sep=''), 
+                paste('downregulated (n=', length(y.neg),')', sep='')), 
+       fill=c('red', 'blue'), bty='n', ncol=1, cex=1.2)
+
+##############################################
+## add gene set stick diagrams
+##############################################
+cc=0
+for(gs in names(ecm)){
+        
+        ypos <- 1-cc*1/length(ecm)
+        
+        ##########################################
+        ## match gene sets to data ranks
+        locs <- match(ecm[[gs]], gn.tmp)
+        
+        ## colors
+        cols <- rep('red', length(locs))
+        cols[y[locs] < 0] <- 'blue'
+        
+        if(cc == 0)
+                plot(x[locs], rep(ypos, length(locs)), ylim=c(0, 1), axes=F, ylab='', xlab='', pch='|', col=cols, xlim=c(1, length(x)) )
+        else
+                points(x[locs], rep(ypos, length(locs)), ylim=c(0, 1),ylab='', xlab='', pch='|', col=cols )
+        
+        ## gene set name
+        mtext(gs, side=2, at=ypos, las=2, cex=.7)
+        ## ssGSEA FDR
+        mtext(round(pval.ecm[gs, cl],3), side=4, at=ypos, las=2, cex=.7, line=0, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
+        mtext(round(fdr.ecm[gs, cl],3), side=4, at=ypos, las=2, cex=.7, line=3, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
+        
+        mtext('p-val', side=4, at=1.1, cex=.9, las=2 )
+        mtext('FDR', side=4, at=1.1, cex=.9, las=2, line=3)
+        
+        cc=cc+1
+}
 
 }
