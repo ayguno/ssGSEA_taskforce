@@ -305,8 +305,8 @@ server<-function(input, output, session) {
         else{
           
                 # Work here to read expression input!!
-          # input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds,
-          #                              urls= MSIG.Gct2Frame(filename = input$input.gct$datapath)$descs)        
+         input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds)
+                                               
                 
          results.gct <<- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
                                    urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
