@@ -55,11 +55,12 @@ feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
                               )
 feature.name <- names(input.gct)[1]
 
-generate.GSEAplot <- function(feature.name,feature.exp,feature.geneset){
+generate.GSEAplot <- function(feature.name,feature.exp,feature.geneset,genesets){
 # Generates GSEAplot for a given feature (treatment, condition)
 # feature.name: name of the user-selected feature        
 # feature.exp: gene-named vector of expression values for a given feature
 # feature.geneset: data.frame contains the selected gene sets along with their NES, FDR and P-val
+# genesets: the available geneset database        
 
 # For the base plot
 feature.exp <- feature.exp[!is.na(feature.exp)] # remove missing values
@@ -91,10 +92,16 @@ legend('topright',
 ##############################################
 ## add gene set stick diagrams
 ##############################################
+
+# Get the relevant genesets
+geneset.names <- sapply(genesets,function(x)x[[1]][1])
+grep(feature.geneset$gset[3],geneset.names) 
+
 cc=0
-for(gs in names(ecm)){
+for(gs in seq_along(feature.geneset$gset)){
         
-        ypos <- 1-cc*1/length(ecm)
+        ypos <- 1-cc*1/length(feature.geneset$gset)
+        
         
         ##########################################
         ## match gene sets to data ranks
