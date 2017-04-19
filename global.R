@@ -41,27 +41,18 @@ genesets <- strsplit(readLines(gmt),"\t") # read as a list and access features
 warning("No or multiple gene sets.") 
 
 
-####################
-# Dev. purpose only
-####################
-feature.index <- 1 # Only one value, selected feature
-gene.set.index <- 1:3 # Can be multiple values, selected genesets
 
-feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
-feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
-                              NES = results.gct[gene.set.index,feature.index],
-                              P.value = p.values.gct[gene.set.index,feature.index],
-                              FDR = fdr.gct[gene.set.index,feature.index]
-                              )
-feature.name <- names(input.gct)[1]
 
 generate.GSEAplot <- function(feature.name,feature.exp,feature.geneset,genesets){
+##################################################################################################
 # Generates GSEAplot for a given feature (treatment, condition)
+#        
 # feature.name: name of the user-selected feature        
 # feature.exp: gene-named vector of expression values for a given feature
 # feature.geneset: data.frame contains the selected gene sets along with their NES, FDR and P-val
 # genesets: the available geneset database        
-
+##################################################################################################
+        
 # For the base plot
 feature.exp <- feature.exp[!is.na(feature.exp)] # remove missing values
 feature.exp <- feature.exp[order(feature.exp,decreasing = TRUE)]
@@ -77,7 +68,7 @@ y.pos <- y[y>0]
 x.neg <- x[y<0]
 y.neg <- y[y<0]
 
-par(mfrow=c(2,1), mar=c(1,10,2,5))
+par(mfrow=c(2,1), mar=c(1,12,2,7))
 plot(x, y, type='l', ylab= "Expression ratio",axes=F, xlab='Rank',
      main = paste0("ssGSEA feature plot for ",feature.name),
      xlim=c(1, length(x)), lwd = 2)
@@ -119,13 +110,14 @@ for(gs in seq_along(geneset.subset)){
         
         ## gene set name
         mtext(geneset.subset[[gs]][1], side=2, at=ypos, las=2, cex=.7)
-        ## ssGSEA FDR
+        ## ssGSEA NES,P.values and FDR
         w <- which(feature.geneset$gset == geneset.subset[[gs]][1])
-        mtext(round(feature.geneset$NES[w], side=4, at=ypos, las=2, cex=.7, line=0, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
-        mtext(round(fdr.ecm[gs, cl],3), side=4, at=ypos, las=2, cex=.7, line=3, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
-        
-        mtext('p-val', side=4, at=1.1, cex=.9, las=2 )
-        mtext('FDR', side=4, at=1.1, cex=.9, las=2, line=3)
+        mtext(round(feature.geneset$NES[w],3), side=4, at=ypos, las=2, cex=.7, line=0, col="black")
+        mtext(round(feature.geneset$P.value[w],3), side=4, at=ypos, las=2, cex=.7, line=2, col="black")
+        mtext(round(feature.geneset$FDR[w],3), side=4, at=ypos, las=2, cex=.7, line=4, col="black")
+        mtext('NES', side=4, at=1.1, cex=.9, las=2, line =0)
+        mtext('p-val', side=4, at=1.1, cex=.9, las=2, line =2)
+        mtext('FDR', side=4, at=1.1, cex=.9, las=2, line=4)
         
         cc=cc+1
 }

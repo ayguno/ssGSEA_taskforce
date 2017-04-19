@@ -225,7 +225,10 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
-                                                                h5("GSEAplot will be here!")
+                                                                box(title="ssGSEAplot",status = "primary",
+                                                                h5("GSEAplot should be here!"),
+                                                                plotOutput("ssGSEAplot", width = "100%", height = 300)
+                                                                )
                                                         ),# End of GSEAplot tab
                                                         
                                                         # GSEAheatmap tab
@@ -333,8 +336,35 @@ server<-function(input, output, session) {
         
         )
         
+        #########################################################################
         # Compute the plots/heatmaps required for the analysis 
+        #########################################################################
         
+        # Prepare the ssGSEAplot
         
+        observeEvent(global.values$task,
+                     if(global.values$task == "analyze.GSEA.step2" ){
+        
+                        ssGSEAplot <- renderPlot({
+                        
+                        ####################
+                        # Dev. purpose only
+                        ####################
+                        feature.index <- 1 # Only one value, selected feature
+                        gene.set.index <- 1:3 # Can be multiple values, selected genesets
+                        
+                        feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
+                        feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
+                                                      NES = results.gct[gene.set.index,feature.index],
+                                                      P.value = p.values.gct[gene.set.index,feature.index],
+                                                      FDR = fdr.gct[gene.set.index,feature.index]
+                        )
+                        feature.name <- names(input.gct)[1]
+                        
+                        generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                })
+        
+         })
+       
         
 }# End of server        
