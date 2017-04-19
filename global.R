@@ -66,5 +66,22 @@ feature.exp <- feature.exp[!is.na(feature.exp)] # remove missing values
 feature.exp <- feature.exp[order(feature.exp,decreasing = TRUE)]
 
 x <- 1:length(feature.exp)
-        
+y <- unname(feature.exp)  
+
+# positive expression
+x.pos <- x[y>0]
+y.pos <- y[y>0]
+
+# negative expression
+x.neg <- x[y<0]
+y.neg <- y[y<0]
+
+plot(x, y, type='l', ylab= "Expression ratio",axes=F, xlab='Rank',
+     main = paste0("ssGSEA feature plot for ",feature.name),
+     xlim=c(1, length(x)))
+axis(2, las=2)
+axis(1, cex=.9, at=seq(0, length(x), 1e3))
+polygon(c(x.pos, 1),c(y.pos,0), col='red')
+polygon(c(x.neg, length(x)),c(y.neg,0), col='blue')
+
 }
