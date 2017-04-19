@@ -12,6 +12,7 @@ server<-function(input, output, session) {
         #######################################################################
         
         global.values <- reactiveValues(task = NULL,
+                                        input.gct = NULL,
                                         results.gct = NULL,
                                         p.values.gct = NULL,
                                         fdr.gct = NULL)
@@ -112,6 +113,11 @@ server<-function(input, output, session) {
                         box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
                             background = "navy", width = 12, height = "100%",
                             h3("Step1: Load your data"), br(),
+                            
+                            fileInput(inputId = "input.gct",width = '400px',
+                                      label = "Select to upload your input.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
                             fileInput(inputId = "results.gct",width = '400px',
                                       label = "Select to upload your results.gct file",
                                       multiple = FALSE,
@@ -153,6 +159,11 @@ server<-function(input, output, session) {
                         box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
                             background = "navy", width = 12, height = "100%",
                             h3("Step1: Load your data"), br(), 
+                            
+                            fileInput(inputId = "input.gct",width = '400px',
+                                      label = "Select to upload your input.gct file",
+                                      multiple = FALSE,
+                                      accept = ".gct"),
                             fileInput(inputId = "results.gct",width = '400px',
                                       label = "Select to upload your results.gct file",
                                       multiple = FALSE,
@@ -276,21 +287,27 @@ server<-function(input, output, session) {
         #
         #######################################
         
-        # Extract data from results and fdr files
+        # Extract data from gene expression data set, results and fdr files
         observe(
        
         # Read results.gct and fdr.gct
-        if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) ){ 
+        if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) & !is.null(input$input.gct) ){ 
                 
         # First check the files to decide if they are readable        
         line.gct <- length(readLines(input$results.gct$datapath)) 
         line.p.values <- length(readLines(input$p.values.gct$datapath))
         line.fdr <- length(readLines(input$fdr.gct$datapath))
-        if(line.gct < 4 | line.fdr < 4 | line.p.values < 4){
+        line.input <- length(readLines(input$input.gct$datapath))
+        
+        if(line.gct < 4 | line.fdr < 4 | line.p.values < 4 | line.input < 4){
                 global.errors$analysis.step1 = "error"       
         }
         else{
-        
+          
+                # Work here to read expression input!!
+          # input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds,
+          #                              urls= MSIG.Gct2Frame(filename = input$input.gct$datapath)$descs)        
+                
          results.gct <<- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
                                    urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
          
@@ -299,6 +316,7 @@ server<-function(input, output, session) {
          
          fdr.gct <<- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
                                     urls= MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$descs)
+         
          
         #Update the global if not null
         if(!is.null(results.gct) | !is.null(fdr.gct) | !is.null(p.values.gct) ) {

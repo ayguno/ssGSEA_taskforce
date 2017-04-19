@@ -36,6 +36,6 @@ require(scales)
 
 gmt <- dir(pattern = ".gmt")
 if(length(gmt == 1)){
-geneset <- strsplit(readLines(gmt)," ")
+geneset <- strsplit(readLines(gmt),"\t") # read as a list and access features
 }else
 warning("No or multiple gene sets.")        
