@@ -77,6 +77,7 @@ y.pos <- y[y>0]
 x.neg <- x[y<0]
 y.neg <- y[y<0]
 
+par(mfrow=c(2,1), mar=c(1,10,2,5))
 plot(x, y, type='l', ylab= "Expression ratio",axes=F, xlab='Rank',
      main = paste0("ssGSEA feature plot for ",feature.name),
      xlim=c(1, length(x)), lwd = 2)
@@ -95,17 +96,17 @@ legend('topright',
 
 # Get the relevant genesets
 geneset.names <- sapply(genesets,function(x)x[[1]][1])
-grep(feature.geneset$gset[3],geneset.names) 
+geneset.subset <- genesets[geneset.names %in% feature.geneset$gset ]
 
 cc=0
-for(gs in seq_along(feature.geneset$gset)){
+for(gs in seq_along(geneset.subset)){
         
-        ypos <- 1-cc*1/length(feature.geneset$gset)
+        ypos <- 1-cc*1/length(geneset.subset)
         
-        
+        geneset.subset.genes <- geneset.subset[[gs]][-c(1,2)]
         ##########################################
         ## match gene sets to data ranks
-        locs <- match(ecm[[gs]], gn.tmp)
+        locs <- match(geneset.subset.genes, names(feature.exp))
         
         ## colors
         cols <- rep('red', length(locs))
@@ -117,9 +118,10 @@ for(gs in seq_along(feature.geneset$gset)){
                 points(x[locs], rep(ypos, length(locs)), ylim=c(0, 1),ylab='', xlab='', pch='|', col=cols )
         
         ## gene set name
-        mtext(gs, side=2, at=ypos, las=2, cex=.7)
+        mtext(geneset.subset[[gs]][1], side=2, at=ypos, las=2, cex=.7)
         ## ssGSEA FDR
-        mtext(round(pval.ecm[gs, cl],3), side=4, at=ypos, las=2, cex=.7, line=0, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
+        w <- which(feature.geneset$gset == geneset.subset[[gs]][1])
+        mtext(round(feature.geneset$NES[w], side=4, at=ypos, las=2, cex=.7, line=0, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
         mtext(round(fdr.ecm[gs, cl],3), side=4, at=ypos, las=2, cex=.7, line=3, col=ifelse( score.ecm[gs, cl] < 0, 'blue', 'red' ))
         
         mtext('p-val', side=4, at=1.1, cex=.9, las=2 )
