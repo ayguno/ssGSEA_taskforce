@@ -227,7 +227,7 @@ server<-function(input, output, session) {
                                                         tabItem(tabName = "GSEAplot", 
                                                                 box(title="ssGSEAplot",status = "primary",
                                                                 h5("GSEAplot should be here!"),
-                                                                plotOutput("ssGSEAplot", width = "100%", height = 300)
+                                                                plotOutput("ssGSEAplot", width = "100%", height = "100%")
                                                                 )
                                                         ),# End of GSEAplot tab
                                                         
