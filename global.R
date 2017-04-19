@@ -36,6 +36,15 @@ require(scales)
 
 gmt <- dir(pattern = ".gmt")
 if(length(gmt == 1)){
-geneset <- strsplit(readLines(gmt),"\t") # read as a list and access features
+genesets <- strsplit(readLines(gmt),"\t") # read as a list and access features
 }else
-warning("No or multiple gene sets.")        
+warning("No or multiple gene sets.") 
+
+
+generate.GSEAplot <- function(feature.exp,feature.geneset){
+# Generates GSEAplot for a given feature (treatment, condition)
+# feature.exp: gene-named vector of expression values for a given feature
+# feature.geneset: data.frame contains the selected gene sets along with their NES, FDR and P-val
+        
+        
+}
