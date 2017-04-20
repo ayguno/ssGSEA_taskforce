@@ -124,3 +124,46 @@ for(gs in seq_along(geneset.subset)){
 }
 
 }
+
+
+####################################
+
+####################
+# Dev. purpose only
+####################
+
+
+#Next, aim to make these two user-selectible, enable FDR filtering        
+##################################################################        
+feature.index <- 1:ncol(results.gct) #Can be one value or all available features
+gene.set.index <- 1:10 # Can be multiple values, selected genesets
+##################################################################
+
+
+
+
+results.gct <- global.values$results.gct
+p.values.gct <- global.values$p.values.gct
+fdr.gct <- global.values$fdr.gct
+
+feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
+                              NES = results.gct[gene.set.index,feature.index],
+                              P.value = p.values.gct[gene.set.index,feature.index],
+                              FDR = fdr.gct[gene.set.index,feature.index])
+
+feature.name <- names(input.gct)[feature.index]
+
+
+
+
+
+generate.ssGSEAheatmap <- function(feature.name,feature.geneset){
+        ##################################################################################################
+        # Generates GSEAheatmap of NES for a given features (treatment, condition)
+        #        
+        # feature.name: name of the user-selected features (by default all features)        
+        # feature.geneset: data.frame contains the selected gene sets along with their NES, FDR and P-val
+        ##################################################################################################        
+        
+        
+}

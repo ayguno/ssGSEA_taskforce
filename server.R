@@ -233,16 +233,16 @@ server<-function(input, output, session) {
                         else{
                                 
                                 # Work here to read expression input!!
-                                input.gct <- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds)
+                                input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds)
                                 
                                 
-                                results.gct <- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
+                                results.gct <<- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
                                                            urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
                                 
-                                p.values.gct <- data.frame(MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$ds,
+                                p.values.gct <<- data.frame(MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$ds,
                                                             urls= MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$descs)
                                 
-                                fdr.gct <- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
+                                fdr.gct <<- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
                                                        urls= MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$descs)
                                 
                                 
@@ -362,11 +362,15 @@ server<-function(input, output, session) {
                         
                         output$ssGSEAplot <- renderPlot({
                                 
-                                ####################
-                                # Dev. purpose only
-                                ####################
+                                
                                 isolate({
+                                 
                                         
+                                        ####################
+                                        # Dev. purpose only
+                                        ####################
+                                        
+                                                       
                                  #Next, aim to make these two user-selectible, enable FDR filtering        
                                  ##################################################################        
                                  feature.index <- 1 # Only one value, selected feature
