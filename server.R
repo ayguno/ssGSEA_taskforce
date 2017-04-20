@@ -264,13 +264,21 @@ server<-function(input, output, session) {
         
         
         
-        ##################################
+        #######################################################
         #   
-        #  Prepare the analysis outputs
+        #  Prepare the analysis outputs for analyze.GSEA.step2 
         # 
-        ##################################
+        #######################################################
         
         observeEvent(global.values$task,
+                
+                     ########################################
+                     #
+                     # UI definition for analyze.GSEA.step2 
+                     #
+                     ########################################
+                     
+                     
                 if(global.values$task == "analyze.GSEA.step2" ){
                         
                 
@@ -383,7 +391,7 @@ server<-function(input, output, session) {
                                  
                                 })
                                 
-                                 plot(1:10,1:10)
+                                
                                  generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
                                  cat("Also executed")
                                 
