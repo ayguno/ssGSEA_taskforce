@@ -401,7 +401,7 @@ server<-function(input, output, session) {
                                 
                                 
                                  generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
-                                 cat("Also executed")
+                                 cat("--GSEAplot executed\n")
                                 
                                 
                         })           
@@ -441,7 +441,7 @@ server<-function(input, output, session) {
                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = FALSE, 
                                                        cluster.columns = FALSE, scale = "none",
                                                        FDR.cut.off = "")
-                                cat("Heatmap also executed")
+                                cat("--Heatmap executed\n")
                                 
                                 
                         })      
