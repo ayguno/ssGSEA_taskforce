@@ -263,6 +263,13 @@ server<-function(input, output, session) {
         )
         
         
+        
+        ##################################
+        #   
+        #  Prepare the analysis outputs
+        # 
+        ##################################
+        
         observeEvent(global.values$task,
                 if(global.values$task == "analyze.GSEA.step2" ){
                         
@@ -284,9 +291,10 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
-                                                                box(title="ssGSEAplot",status = "primary",
-                                                                h5("GSEAplot should be here!"),
-                                                                plotOutput(outputId = "ssGSEAplot")
+                                                                box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
+                                                                    background = "navy",width = 11, height = "100%",
+                                                                
+                                                                plotOutput(outputId = "ssGSEAplot", width = "100%", height = "700px")
                                                                 )
                                                         ),# End of GSEAplot tab
                                                         
@@ -336,8 +344,13 @@ server<-function(input, output, session) {
                                 updateTabsetPanel(session, "tabitems",selected= newvalue)
                         })
                         
-                       
+                        #########################################################################
+                        # Compute the plots/heatmaps required for the analysis 
+                        #########################################################################
                         
+                        ###########################
+                        # Prepare the ssGSEAplot
+                        ###########################
                         
                         output$ssGSEAplot <- renderPlot({
                                 
@@ -345,9 +358,15 @@ server<-function(input, output, session) {
                                 # Dev. purpose only
                                 ####################
                                 isolate({
+                                        
+                                 #Next, aim to make these two user-selectible, enable FDR filtering        
+                                 ##################################################################        
                                  feature.index <- 1 # Only one value, selected feature
-                                 gene.set.index <- 1:3 # Can be multiple values, selected genesets
-
+                                 gene.set.index <- 1:10 # Can be multiple values, selected genesets
+                                 ##################################################################
+                                 
+                                 
+                                 
                                  input.gct <- global.values$input.gct
                                  results.gct <- global.values$results.gct
                                  p.values.gct <- global.values$p.values.gct
@@ -371,6 +390,9 @@ server<-function(input, output, session) {
                                 
                         })           
                         
+                        ###########################
+                        # Prepare the ssGSEAheatmap
+                        ###########################
                         
                         
                 }
@@ -380,11 +402,7 @@ server<-function(input, output, session) {
         
        
         
-        #########################################################################
-        # Compute the plots/heatmaps required for the analysis 
-        #########################################################################
         
-        # Prepare the ssGSEAplot
         
       
         
