@@ -308,7 +308,11 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAheatmap tab
                                                         tabItem(tabName = "GSEAheatmap", 
-                                                                h5("GSEAheatmap will be here!")
+                                                                h5("GSEAheatmap will be here!"),
+                                                                box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
+                                                                    background = "navy",width = 11, height = "100%",
+                                                                plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
+                                                                )
                                                         )# End of GSEAheatmap tab 
                                                 )
                                         
@@ -405,7 +409,42 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAheatmap
                         ###########################
-                        
+                        output$ssGSEAheatmap <- renderPlot({
+                                
+                                
+                                isolate({
+                                        
+                                        
+                                        ####################
+                                        # Dev. purpose only
+                                        ####################
+                                        
+                                        
+                                        #Next, aim to make these two user-selectible, enable FDR filtering        
+                                        ##################################################################        
+                                        feature.index <- 1:(ncol(results.gct)-1) # Can be one value or all available features
+                                        gene.set.index <- 1:nrow(results.gct) # Can be multiple values, selected genesets
+                                        ##################################################################
+                                        
+                                        results.gct <- global.values$results.gct
+                                        fdr.gct <- global.values$fdr.gct
+                                        
+                                        
+                                        sub.results.gct <- results.gct[gene.set.index,feature.index]
+                                        
+                                        FDR.cut.off <- ""
+                                        
+                                        
+                                })
+                                
+                                
+                                generate.ssGSEAheatmap(sub.results.gct, cluster.rows = FALSE, 
+                                                       cluster.columns = FALSE, scale = "none",
+                                                       FDR.cut.off = "")
+                                cat("Heatmap also executed")
+                                
+                                
+                        })      
                         
                 }
         )# End of analyze.GSEA.step2 observer

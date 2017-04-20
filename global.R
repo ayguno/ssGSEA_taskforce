@@ -128,42 +128,28 @@ for(gs in seq_along(geneset.subset)){
 
 ####################################
 
-####################
-# Dev. purpose only
-####################
-
-
-#Next, aim to make these two user-selectible, enable FDR filtering        
-##################################################################        
-feature.index <- 1:ncol(results.gct) #Can be one value or all available features
-gene.set.index <- 1:10 # Can be multiple values, selected genesets
-##################################################################
-
-
-
-
-results.gct <- global.values$results.gct
-p.values.gct <- global.values$p.values.gct
-fdr.gct <- global.values$fdr.gct
-
-feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
-                              NES = results.gct[gene.set.index,feature.index],
-                              P.value = p.values.gct[gene.set.index,feature.index],
-                              FDR = fdr.gct[gene.set.index,feature.index])
-
-feature.name <- names(input.gct)[feature.index]
-
-
-
-
-
-generate.ssGSEAheatmap <- function(feature.name,feature.geneset){
+generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE, 
+                                   cluster.columns = FALSE, scale = "none",
+                                   FDR.cut.off = ""){
         ##################################################################################################
         # Generates GSEAheatmap of NES for a given features (treatment, condition)
-        #        
-        # feature.name: name of the user-selected features (by default all features)        
-        # feature.geneset: data.frame contains the selected gene sets along with their NES, FDR and P-val
-        ##################################################################################################        
+        #
+        # sub.results.gct: subset of results.gct based on user preferences (defaults to results.gct)
+        # FDR.cut.off: character vector specifying the FDR.cut.off applied by the user
+        ################################################################################################## 
+        x <- as.matrix(sub.results.gct); row.names(x) <- row.names(results.gct)
+        annt<-data.frame(Features = colnames(sub.results.gct))
+        row.names(annt)<- colnames(sub.results.gct) #pheatmap requires the row names 
+        limits <- c(seq(min(x,na.rm = TRUE),0,length.out = 500),
+                    seq(0.0001,(max(x,na.rm = TRUE)),length.out = 500))
         
+        
+        colfuncUPDN <- colorRampPalette(c("blue","white","Red"))
+        
+        
+        pheatmap(x, color=colfuncUPDN(1000), border_color = "white", cluster_rows = cluster.rows,
+                 cluster_cols = cluster.columns,fontsize_number = 3, fontsize_row = 5, breaks = limits, 
+                 fontsize_col = 10,annotation_col =annt,#annotation_colors = ann_colors, 
+                 na_col = "darkgray",treeheight_col =20, main = paste0("ssGSEA heatmap, FDR.p.val < ",FDR.cut.off))
         
 }
