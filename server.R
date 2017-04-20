@@ -286,7 +286,7 @@ server<-function(input, output, session) {
                                                         tabItem(tabName = "GSEAplot", 
                                                                 box(title="ssGSEAplot",status = "primary",
                                                                 h5("GSEAplot should be here!"),
-                                                                plotOutput(outputId = "ssGSEAplot", width = "100%", height = "100%")
+                                                                plotOutput(outputId = "ssGSEAplot")
                                                                 )
                                                         ),# End of GSEAplot tab
                                                         
@@ -340,31 +340,34 @@ server<-function(input, output, session) {
                         
                         
                         output$ssGSEAplot <- renderPlot({
-                                cat("Executed\n\n")
+                                
                                 ####################
                                 # Dev. purpose only
                                 ####################
-                                feature.index <- 1 # Only one value, selected feature
-                                gene.set.index <- 1:3 # Can be multiple values, selected genesets
+                                isolate({
+                                 feature.index <- 1 # Only one value, selected feature
+                                 gene.set.index <- 1:3 # Can be multiple values, selected genesets
+
+                                 input.gct <- global.values$input.gct
+                                 results.gct <- global.values$results.gct
+                                 p.values.gct <- global.values$p.values.gct
+                                 fdr.gct <- global.values$fdr.gct
                                 
-                                input.gct <- global.values$input.gct
-                                results.gct <- global.values$results.gct
-                                p.values.gct <- global.values$p.values.gct
-                                fdr.gct <- global.values$fdr.gct
+                                 feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
+                                 feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
+                                                               NES = results.gct[gene.set.index,feature.index],
+                                                               P.value = p.values.gct[gene.set.index,feature.index],
+                                                               FDR = fdr.gct[gene.set.index,feature.index])
                                 
-                                feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
-                                feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
-                                                              NES = results.gct[gene.set.index,feature.index],
-                                                              P.value = p.values.gct[gene.set.index,feature.index],
-                                                              FDR = fdr.gct[gene.set.index,feature.index])
+                                 feature.name <- names(input.gct)[1]
+
+                                 
+                                })
                                 
-                                feature.name <- names(input.gct)[1]
+                                 plot(1:10,1:10)
+                                 generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                                 cat("Also executed")
                                 
-                                cat(head(feature.exp),"\n", length(feature.exp),"\n")
-                                p<-plot(1:10,1:10)
-                                #plotPNG(func = generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets))
-                                cat("Also executed")
-                                print(p)
                                 
                         })           
                         
