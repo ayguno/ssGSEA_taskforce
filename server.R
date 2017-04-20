@@ -202,14 +202,72 @@ server<-function(input, output, session) {
         )# End of analysis.step1.error observer
         
         
-        ####################################
+        #########################################################
         # 
         #  STEP2: GSEAplot and GSEAheatmap
         #
-        ####################################
+        #########################################################
+        #######################################
+        #
+        #
+        # Actual computation for analyze.GSEA
+        #
+        #
+        #######################################
+        
+        # Extract data from gene expression data set, results and fdr files
+        observe(
+                
+                # Read results.gct and fdr.gct
+                if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) & !is.null(input$input.gct) ){ 
+                        
+                        # First check the files to decide if they are readable        
+                        line.gct <- length(readLines(input$results.gct$datapath)) 
+                        line.p.values <- length(readLines(input$p.values.gct$datapath))
+                        line.fdr <- length(readLines(input$fdr.gct$datapath))
+                        line.input <- length(readLines(input$input.gct$datapath))
+                        
+                        if(line.gct < 4 | line.fdr < 4 | line.p.values < 4 | line.input < 4){
+                                global.errors$analysis.step1 = "error"       
+                        }
+                        else{
+                                
+                                # Work here to read expression input!!
+                                input.gct <- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds)
+                                
+                                
+                                results.gct <- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
+                                                           urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
+                                
+                                p.values.gct <- data.frame(MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$ds,
+                                                            urls= MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$descs)
+                                
+                                fdr.gct <- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
+                                                       urls= MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$descs)
+                                
+                                
+                                #Update the global if not null
+                                if(!is.null(results.gct) | !is.null(fdr.gct) | !is.null(p.values.gct) | !is.null(input.gct) ) {
+                                        global.values$input.gct <- input.gct
+                                        global.values$results.gct <- results.gct
+                                        global.values$p.values.gct <- p.values.gct
+                                        global.values$fdr.gct <- fdr.gct
+                                        
+                                        # When files make sense, Initiate the ui change to Step2 
+                                        # Move to the next step once file upload is complete
+                                        global.values$task = "analyze.GSEA.step2"
+                                }
+                        }
+                }
+                
+        )
+        
         
         observeEvent(global.values$task,
                 if(global.values$task == "analyze.GSEA.step2" ){
+                        
+                
+                        
                         output$mainbody <- renderUI(
                                
                                         tabItems(
@@ -221,13 +279,14 @@ server<-function(input, output, session) {
                                                             actionLink("link_to_GSEAplot",label = uiOutput("GSEAplot.box",width = 4)),
                                                             actionLink("link_to_GSEAheatmap",label = uiOutput("GSEAheatmap.box",width = 4))
                                                                 )
+                                                        
                                                         ),# End of analyze tab
                                                         
                                                         # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
                                                                 box(title="ssGSEAplot",status = "primary",
                                                                 h5("GSEAplot should be here!"),
-                                                                plotOutput("ssGSEAplot", width = "100%", height = "100%")
+                                                                plotOutput(outputId = "ssGSEAplot", width = "100%", height = "100%")
                                                                 )
                                                         ),# End of GSEAplot tab
                                                         
@@ -276,65 +335,47 @@ server<-function(input, output, session) {
                                 newvalue <- "GSEAheatmap"
                                 updateTabsetPanel(session, "tabitems",selected= newvalue)
                         })
-                            
+                        
+                       
+                        
+                        
+                        output$ssGSEAplot <- renderPlot({
+                                cat("Executed\n\n")
+                                ####################
+                                # Dev. purpose only
+                                ####################
+                                feature.index <- 1 # Only one value, selected feature
+                                gene.set.index <- 1:3 # Can be multiple values, selected genesets
+                                
+                                input.gct <- global.values$input.gct
+                                results.gct <- global.values$results.gct
+                                p.values.gct <- global.values$p.values.gct
+                                fdr.gct <- global.values$fdr.gct
+                                
+                                feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
+                                feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
+                                                              NES = results.gct[gene.set.index,feature.index],
+                                                              P.value = p.values.gct[gene.set.index,feature.index],
+                                                              FDR = fdr.gct[gene.set.index,feature.index])
+                                
+                                feature.name <- names(input.gct)[1]
+                                
+                                cat(head(feature.exp),"\n", length(feature.exp),"\n")
+                                p<-plot(1:10,1:10)
+                                #plotPNG(func = generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets))
+                                cat("Also executed")
+                                print(p)
+                                
+                        })           
+                        
+                        
+                        
                 }
         )# End of analyze.GSEA.step2 observer
         
 
         
-        #######################################
-        #
-        #
-        # Actual computation for analyze.GSEA
-        #
-        #
-        #######################################
-        
-        # Extract data from gene expression data set, results and fdr files
-        observe(
        
-        # Read results.gct and fdr.gct
-        if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) & !is.null(input$input.gct) ){ 
-                
-        # First check the files to decide if they are readable        
-        line.gct <- length(readLines(input$results.gct$datapath)) 
-        line.p.values <- length(readLines(input$p.values.gct$datapath))
-        line.fdr <- length(readLines(input$fdr.gct$datapath))
-        line.input <- length(readLines(input$input.gct$datapath))
-        
-        if(line.gct < 4 | line.fdr < 4 | line.p.values < 4 | line.input < 4){
-                global.errors$analysis.step1 = "error"       
-        }
-        else{
-          
-                # Work here to read expression input!!
-         input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds)
-                                               
-                
-         results.gct <<- data.frame(MSIG.Gct2Frame(filename = input$results.gct$datapath)$ds,
-                                   urls= MSIG.Gct2Frame(filename = input$results.gct$datapath)$descs)
-         
-         p.values.gct <<- data.frame(MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$ds,
-                                    urls= MSIG.Gct2Frame(filename = input$p.values.gct$datapath)$descs)
-         
-         fdr.gct <<- data.frame(MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$ds,
-                                    urls= MSIG.Gct2Frame(filename = input$fdr.gct$datapath)$descs)
-         
-         
-        #Update the global if not null
-        if(!is.null(results.gct) | !is.null(fdr.gct) | !is.null(p.values.gct) ) {
-                global.values$results.gct <- results.gct
-                global.values$p.values.gct <- p.values.gct
-                global.values$fdr.gct <- fdr.gct
-                
-                # When files make sense, Initiate the ui change to Step2 
-                # Move to the next step once file upload is complete
-                global.values$task = "analyze.GSEA.step2"
-                }
-            }
-        }
-        
-        )
         
         #########################################################################
         # Compute the plots/heatmaps required for the analysis 
@@ -342,29 +383,11 @@ server<-function(input, output, session) {
         
         # Prepare the ssGSEAplot
         
-        observeEvent(global.values$task,
-                     if(global.values$task == "analyze.GSEA.step2" ){
+      
         
-                        ssGSEAplot <- renderPlot({
                         
-                        ####################
-                        # Dev. purpose only
-                        ####################
-                        feature.index <- 1 # Only one value, selected feature
-                        gene.set.index <- 1:3 # Can be multiple values, selected genesets
-                        
-                        feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
-                        feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
-                                                      NES = results.gct[gene.set.index,feature.index],
-                                                      P.value = p.values.gct[gene.set.index,feature.index],
-                                                      FDR = fdr.gct[gene.set.index,feature.index]
-                        )
-                        feature.name <- names(input.gct)[1]
-                       # plot(1:10,1:10) it doesn't plot anything in the ui
-                       generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
-                })
         
-         })
+         
        
         
 }# End of server        
