@@ -207,6 +207,7 @@ server<-function(input, output, session) {
         #  STEP2: GSEAplot and GSEAheatmap
         #
         #########################################################
+        
         #######################################
         #
         #
@@ -215,7 +216,10 @@ server<-function(input, output, session) {
         #
         #######################################
         
+        ####################################################################
         # Extract data from gene expression data set, results and fdr files
+        ####################################################################
+        
         observe(
                 
                 # Read results.gct and fdr.gct
