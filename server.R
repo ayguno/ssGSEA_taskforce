@@ -314,7 +314,7 @@ server<-function(input, output, session) {
                                                                     
                                                                     selectInput("feature",choices = global.values$features,
                                                                                 selected = global.values$features[1],
-                                                                                label = "Select a sample to display",width = 6),
+                                                                                label = "Select a sample to display",width = 200),
                                                                 
                                                                 plotOutput(outputId = "ssGSEAplot", width = "100%", height = "700px")
                                                                 )
@@ -349,7 +349,7 @@ server<-function(input, output, session) {
                                                                  selected = "All samples", multiple = TRUE,
                                                                  label = "Select samples to display"))
                                                      ),
-                                            sliderInput("FDR",max = 0.5, min = 0.01, value = 0.5,label = "FDR cutoff for Gene Sets")
+                                            sliderInput("FDR",max = 0.5, min = 0.001, value = 0.01,label = "FDR cutoff for Gene Sets")
                                             
                                         )#End of sidebarMenu
                                 
@@ -386,21 +386,23 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAplot
                         ###########################
-                       observeEvent(c(input$fdr,input$feature),{
-                                fdr.cutoff <- input$FDR
-                                feature <- input$feature
-                                global.values$fdr.cutoff <- fdr.cutoff
-                                global.values$feature <- feature 
-                        
-                        
-                        output$ssGSEAplot <- renderPlot({
+                       observeEvent(c(input$FDR,input$feature),{
                                 
                                
-                                
+                               fdr.cutoff <- input$FDR
+                               feature <- input$feature
+                               global.values$fdr.cutoff <- fdr.cutoff
+                               global.values$feature <- feature 
+                               
+                              withProgress(expr= { 
+                               
+                        output$ssGSEAplot <- renderPlot({
+                               
                                    isolate({
-                                           
                                         
-                                              
+                                                  
+                                           
+                                           
                                         input.gct <- global.values$input.gct
                                         results.gct <- global.values$results.gct
                                         p.values.gct <- global.values$p.values.gct
@@ -410,16 +412,14 @@ server<-function(input, output, session) {
                                         
                                         cat("--fdr cut off:", fdr.cutoff,"\n")
                                         cat("--feature selected:", feature,"\n")
-                                        ####################
-                                        # Dev. purpose only
-                                        ####################
+
                                         
                                         
                                         
                                         #Next, aim to make these two user-selectible, enable FDR filtering        
                                         ##################################################################        
-                                        feature.index <- 1#which(names(results.gct) == feature) # Only one value, selected feature
-                                        gene.set.index <- 1:10#which(fdr.gct[,feature.index] < fdr.cutoff) # Can be multiple values, selected genesets
+                                        feature.index <- which(names(results.gct) == feature) # Only one value, selected feature
+                                        gene.set.index <- which(fdr.gct[,feature.index] < fdr.cutoff) # Can be multiple values, selected genesets
                                         ##################################################################
                                         
                                         cat("--feature.index",feature.index,"\n")
@@ -434,9 +434,6 @@ server<-function(input, output, session) {
                                                                       FDR = fdr.gct[gene.set.index,feature.index])
                                         
                                         feature.name <- names(input.gct)[1]
-                                       
-
-                                        
 
      
                                 })
@@ -446,10 +443,15 @@ server<-function(input, output, session) {
                                 
                                 generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
                                 cat("--GSEAplot executed\n")
-                        })           
+                                
+                             
+                        })
+                              },message = "Preparing ssGSEAplot")
                         
                         
-                       },ignoreNULL = FALSE)
+                       },ignoreNULL = FALSE) # End of c(input$fdr,input$feature) for the reactive ssGSEAplot
+                       
+                       
                         ###########################
                         # Prepare the ssGSEAheatmap
                         ###########################
