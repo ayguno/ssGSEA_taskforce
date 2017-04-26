@@ -332,7 +332,8 @@ server<-function(input, output, session) {
                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
-                                            menuItem("GSEA plot", tabName = "GSEAplot"),
+                                            menuItem("GSEA plot", tabName = "GSEAplot",
+                                                     sliderInput("fdr",max = 0.2, min = 0.01, value = 0.05,label = "FDR cutoff" )),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap")
                                             
                                             
