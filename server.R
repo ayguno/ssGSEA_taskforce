@@ -16,6 +16,7 @@ server<-function(input, output, session) {
                                         results.gct = NULL,
                                         p.values.gct = NULL,
                                         fdr.gct = NULL,
+                                        gene.sets = NULL,
                                         features = NULL,
                                         feature = NULL,
                                         fdr.cutoff = NULL
@@ -261,7 +262,7 @@ server<-function(input, output, session) {
                                         global.values$p.values.gct <- p.values.gct
                                         global.values$fdr.gct <- fdr.gct
                                         global.values$features <- names(results.gct)[1:(length(names(results.gct))-1)]
-                                        
+                                        global.values$gene.sets <-row.names(global.values$results.gct)
                                         
                                         # When files make sense, Initiate the ui change to Step2 
                                         # Move to the next step once file upload is complete
@@ -309,15 +310,15 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
-                                                               # box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
-                                                                #    background = "navy",width = 11, height = "100%",
+                                                                box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
+                                                                    background = "navy",width = 11, height = "100%",
                                                                     
                                                                     selectInput("feature",choices = global.values$features,
                                                                                 selected = global.values$features[1],
-                                                                                label = "Select a sample to display",width = 300),
+                                                                                label = "Select a sample to display:",width = 300),
                                                                 
                                                                 plotOutput(outputId = "ssGSEAplot", width = "100%", height = "800px")
-                                                               # )
+                                                                )
                                                         ),# End of GSEAplot tab
                                                         
                                                         # GSEAheatmap tab
@@ -325,6 +326,11 @@ server<-function(input, output, session) {
                                                                 h5("GSEAheatmap will be here!"),
                                                                 box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
+                                                                    
+                                                                    selectInput("features",choices = global.values$features,
+                                                                                selected = global.values$features[1:length(global.values$features)],
+                                                                                multiple = TRUE,label = "Select samples to display:",width = 300),
+                                                                    
                                                                 plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
                                                                 )
                                                         )# End of GSEAheatmap tab 
@@ -343,14 +349,11 @@ server<-function(input, output, session) {
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
-                                            menuItem("GSEA heatmap", tabName = "GSEAheatmap",
-                                                     menuSubItem(tabName = "GSEAheatmap",
-                                                     selectInput("features",choices = c("All samples",global.values$features),
-                                                                 selected = "All samples", multiple = TRUE,
-                                                                 label = "Select samples to display"))
-                                                     ),
-                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.01,label = "FDR cutoff for Gene Sets")
-                                            
+                                            menuItem("GSEA heatmap", tabName = "GSEAheatmap"),
+                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.01,label = "FDR cutoff for Gene Sets:"),
+                                            selectInput("gene.set",choices = global.values$gene.sets,
+                                                        selected = global.values$gene.sets[1:10], multiple = TRUE,
+                                                        label = "Select genesets to filter:")
                                         )#End of sidebarMenu
                                 
                         )# End of renderUI
@@ -386,14 +389,33 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAplot
                         ###########################
-                       observeEvent(c(input$FDR,input$feature),{
+                        
+                        observeEvent(input$FDR,{
+                                
+                                withProgress(message = "Updating gene set selection ", value = 1, {
+                                        
+                                        fdr.cutoff <- input$FDR
+                                        feature.index <- which(names(fdr.gct) == global.values$feature)
+                                        new.gene.set <- row.names(global.values$fdr.gct)[which(fdr.gct[,feature.index] < fdr.cutoff)]
+                                        
+                                        updateSelectInput(session,inputId = "gene.set",
+                                                          label = "Select genesets to filter:", 
+                                                          choices = new.gene.set)  
+                                }) # End of withProgress
+                                
+                        })
+                        
+                        
+                       observeEvent(c(input$FDR,input$feature, input$gene.set),{
                                 
                                
                                fdr.cutoff <- input$FDR
                                feature <- input$feature
+                               gene.set <- input$gene.set 
                                global.values$fdr.cutoff <- fdr.cutoff
                                global.values$feature <- feature 
-                               
+                                   
+                                       
                               withProgress(expr= { 
                                
                         output$ssGSEAplot <- renderPlot({
@@ -418,8 +440,8 @@ server<-function(input, output, session) {
                                         
                                         #Next, aim to make these two user-selectible, enable FDR filtering        
                                         ##################################################################        
-                                        feature.index <- which(names(results.gct) == feature) # Only one value, selected feature
-                                        gene.set.index <- which(fdr.gct[,feature.index] < fdr.cutoff) # Can be multiple values, selected genesets
+                                        feature.index <- which(names(fdr.gct) == feature) # Only one value, selected feature
+                                        gene.set.index <- which((fdr.gct[,feature.index] < fdr.cutoff) & (row.names(fdr.gct) %in% gene.set )) # Can be multiple values, selected genesets
                                         ##################################################################
                                         
                                         cat("--feature.index",feature.index,"\n")
