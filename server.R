@@ -16,7 +16,10 @@ server<-function(input, output, session) {
                                         results.gct = NULL,
                                         p.values.gct = NULL,
                                         fdr.gct = NULL,
-                                        features = NULL)
+                                        features = NULL,
+                                        feature = NULL,
+                                        fdr.cutoff = NULL
+                                        )
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
         
@@ -342,11 +345,11 @@ server<-function(input, output, session) {
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap",
                                                      menuSubItem(tabName = "GSEAheatmap",
-                                                     selectInput("features",choices = global.values$features,
-                                                                 selected = global.values$features[1],
-                                                                 label = "Select a sample to display"))
+                                                     selectInput("features",choices = c("All samples",global.values$features),
+                                                                 selected = "All samples", multiple = TRUE,
+                                                                 label = "Select samples to display"))
                                                      ),
-                                            sliderInput("FDR",max = 0.2, min = 0.01, value = 0.05,label = "FDR cutoff for Gene Sets")
+                                            sliderInput("FDR",max = 0.5, min = 0.01, value = 0.5,label = "FDR cutoff for Gene Sets")
                                             
                                         )#End of sidebarMenu
                                 
@@ -383,48 +386,69 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAplot
                         ###########################
-                        
-                        output$ssGSEAplot <- renderPlot({
-                                
+                        reTab.ssGSEAplot <- observeEvent(c(input$fdr,input$feature),{
+                                fdr.cutoff <- input$FDR
+                                feature <- input$feature
+                                global.values$fdr.cutoff <- fdr.cutoff
+                                global.values$feature <- feature
+                       
                                 
                                 isolate({
-                                 
-                                  fdr.cutoff <- input$fdr      
+                                        
+                                input.gct <- global.values$input.gct
+                                results.gct <- global.values$results.gct
+                                p.values.gct <- global.values$p.values.gct
+                                fdr.gct <- global.values$fdr.gct
+                        })
+                                        
+                                        
+                                        cat("--fdr cut off:", fdr.cutoff,"\n")
+                                        cat("--feature selected:", feature,"\n")
                                         ####################
                                         # Dev. purpose only
                                         ####################
                                         
-                                                       
-                                 #Next, aim to make these two user-selectible, enable FDR filtering        
-                                 ##################################################################        
-                                 feature.index <- 1 # Only one value, selected feature
-                                 gene.set.index <- 1:10 # Can be multiple values, selected genesets
-                                 ##################################################################
-                                 
-                                 
-                                 
-                                 input.gct <- global.values$input.gct
-                                 results.gct <- global.values$results.gct
-                                 p.values.gct <- global.values$p.values.gct
-                                 fdr.gct <- global.values$fdr.gct
+                                      
+                                        
+                                        #Next, aim to make these two user-selectible, enable FDR filtering        
+                                        ##################################################################        
+                                        feature.index <- 1#which(names(results.gct) == feature) # Only one value, selected feature
+                                        gene.set.index <- 1:10#which(fdr.gct[,feature.index] < fdr.cutoff) # Can be multiple values, selected genesets
+                                        ##################################################################
+                                        
+                                        cat("--feature.index",feature.index,"\n")
+                                        cat("--gene.set.index",gene.set.index,"\n")
+                                        
+                                        
+                                        
+                                        
+                                        feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
+                                        feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
+                                                                      NES = results.gct[gene.set.index,feature.index],
+                                                                      P.value = p.values.gct[gene.set.index,feature.index],
+                                                                      FDR = fdr.gct[gene.set.index,feature.index])
+                                        
+                                        feature.name <- names(input.gct)[1]
+                                        
+                                        
+                                #})
                                 
-                                 feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
-                                 feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
-                                                               NES = results.gct[gene.set.index,feature.index],
-                                                               P.value = p.values.gct[gene.set.index,feature.index],
-                                                               FDR = fdr.gct[gene.set.index,feature.index])
-                                
-                                 feature.name <- names(input.gct)[1]
-
-                                 
-                                })
                                 
                                 
-                                 generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
-                                 cat("--GSEAplot executed\n")
                                 
+                        },ignoreNULL = TRUE)
+                        
+                        
+                        output$ssGSEAplot <- renderPlot({
+                                
+                                
+                                reTab.ssGSEAplot()
+                                generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                                cat("--GSEAplot executed\n")
                                 
                         })           
+                        
+                        
                         
                         ###########################
                         # Prepare the ssGSEAheatmap
