@@ -311,7 +311,7 @@ server<-function(input, output, session) {
                                                                     
                                                                     selectInput("feature",choices = global.values$features,
                                                                                 selected = global.values$features[1],
-                                                                                label = "Select a sample to display"),
+                                                                                label = "Select a sample to display",width = 6),
                                                                 
                                                                 plotOutput(outputId = "ssGSEAplot", width = "100%", height = "700px")
                                                                 )
