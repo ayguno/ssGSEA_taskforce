@@ -15,7 +15,8 @@ server<-function(input, output, session) {
                                         input.gct = NULL,
                                         results.gct = NULL,
                                         p.values.gct = NULL,
-                                        fdr.gct = NULL)
+                                        fdr.gct = NULL,
+                                        features = NULL)
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
         
@@ -256,6 +257,8 @@ server<-function(input, output, session) {
                                         global.values$results.gct <- results.gct
                                         global.values$p.values.gct <- p.values.gct
                                         global.values$fdr.gct <- fdr.gct
+                                        global.values$features <- names(results.gct)[1:(length(names(results.gct))-1)]
+                                        
                                         
                                         # When files make sense, Initiate the ui change to Step2 
                                         # Move to the next step once file upload is complete
@@ -305,6 +308,10 @@ server<-function(input, output, session) {
                                                         tabItem(tabName = "GSEAplot", 
                                                                 box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
+                                                                    
+                                                                    selectInput("feature",choices = global.values$features,
+                                                                                selected = global.values$features[1],
+                                                                                label = "Select a sample to display"),
                                                                 
                                                                 plotOutput(outputId = "ssGSEAplot", width = "100%", height = "700px")
                                                                 )
@@ -332,12 +339,14 @@ server<-function(input, output, session) {
                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
-                                            menuItem("GSEA plot", tabName = "GSEAplot",
-                                                menuSubItem(tabName = "GSEAplot",selected = TRUE,
-                                                sliderInput("FDR",max = 0.2, min = 0.01, value = 0.05,label = "FDR cutoff",animate = TRUE ))),
-                                                
-                                            menuItem("GSEA heatmap", tabName = "GSEAheatmap")
-                                            
+                                            menuItem("GSEA plot", tabName = "GSEAplot"),
+                                            menuItem("GSEA heatmap", tabName = "GSEAheatmap",
+                                                     menuSubItem(tabName = "GSEAheatmap",
+                                                     selectInput("features",choices = global.values$features,
+                                                                 selected = global.values$features[1],
+                                                                 label = "Select a sample to display"))
+                                                     ),
+                                            sliderInput("FDR",max = 0.2, min = 0.01, value = 0.05,label = "FDR cutoff for Gene Sets")
                                             
                                         )#End of sidebarMenu
                                 
