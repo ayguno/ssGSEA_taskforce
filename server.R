@@ -309,15 +309,15 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
-                                                                box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
-                                                                    background = "navy",width = 11, height = "100%",
+                                                               # box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
+                                                                #    background = "navy",width = 11, height = "100%",
                                                                     
                                                                     selectInput("feature",choices = global.values$features,
                                                                                 selected = global.values$features[1],
-                                                                                label = "Select a sample to display",width = 200),
+                                                                                label = "Select a sample to display",width = 300),
                                                                 
-                                                                plotOutput(outputId = "ssGSEAplot", width = "100%", height = "700px")
-                                                                )
+                                                                plotOutput(outputId = "ssGSEAplot", width = "100%", height = "800px")
+                                                               # )
                                                         ),# End of GSEAplot tab
                                                         
                                                         # GSEAheatmap tab
@@ -349,7 +349,7 @@ server<-function(input, output, session) {
                                                                  selected = "All samples", multiple = TRUE,
                                                                  label = "Select samples to display"))
                                                      ),
-                                            sliderInput("FDR",max = 0.5, min = 0.001, value = 0.01,label = "FDR cutoff for Gene Sets")
+                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.01,label = "FDR cutoff for Gene Sets")
                                             
                                         )#End of sidebarMenu
                                 
@@ -433,7 +433,7 @@ server<-function(input, output, session) {
                                                                       P.value = p.values.gct[gene.set.index,feature.index],
                                                                       FDR = fdr.gct[gene.set.index,feature.index])
                                         
-                                        feature.name <- names(input.gct)[1]
+                                        feature.name <- names(input.gct)[feature.index]
 
      
                                 })
