@@ -333,7 +333,9 @@ server<-function(input, output, session) {
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
                                             menuItem("GSEA plot", tabName = "GSEAplot",
-                                                     sliderInput("fdr",max = 0.2, min = 0.01, value = 0.05,label = "FDR cutoff" )),
+                                                menuSubItem(tabName = "GSEAplot",selected = TRUE,
+                                                sliderInput("FDR",max = 0.2, min = 0.01, value = 0.05,label = "FDR cutoff",animate = TRUE ))),
+                                                
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap")
                                             
                                             
@@ -378,7 +380,7 @@ server<-function(input, output, session) {
                                 
                                 isolate({
                                  
-                                        
+                                  fdr.cutoff <- input$fdr      
                                         ####################
                                         # Dev. purpose only
                                         ####################
