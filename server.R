@@ -386,20 +386,23 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAplot
                         ###########################
-                        reTab.ssGSEAplot <- observeEvent(c(input$fdr,input$feature),{
-                                fdr.cutoff <- input$FDR
-                                feature <- input$feature
-                                global.values$fdr.cutoff <- fdr.cutoff
-                                global.values$feature <- feature
-                       
+              
+                        
+                        
+                        output$ssGSEAplot <- renderPlot({
                                 
-                                isolate({
-                                        
-                                input.gct <- global.values$input.gct
-                                results.gct <- global.values$results.gct
-                                p.values.gct <- global.values$p.values.gct
-                                fdr.gct <- global.values$fdr.gct
-                        })
+                        isolate({ 
+                                observeEvent(c(input$fdr,input$feature),{
+                                        fdr.cutoff <- input$FDR
+                                        feature <- input$feature
+                                        global.values$fdr.cutoff <- fdr.cutoff
+                                        global.values$feature <- feature
+
+                                                input.gct <- global.values$input.gct
+                                                results.gct <- global.values$results.gct
+                                                p.values.gct <- global.values$p.values.gct
+                                                fdr.gct <- global.values$fdr.gct
+                                       
                                         
                                         
                                         cat("--fdr cut off:", fdr.cutoff,"\n")
@@ -408,7 +411,7 @@ server<-function(input, output, session) {
                                         # Dev. purpose only
                                         ####################
                                         
-                                      
+                                        
                                         
                                         #Next, aim to make these two user-selectible, enable FDR filtering        
                                         ##################################################################        
@@ -431,19 +434,17 @@ server<-function(input, output, session) {
                                         feature.name <- names(input.gct)[1]
                                         
                                         
-                                #})
+                                        
+                                        
+                                        
+                                        
+                                        
+                                },ignoreNULL = FALSE)
                                 
-                                
-                                
-                                
-                        },ignoreNULL = TRUE)
-                        
-                        
-                        output$ssGSEAplot <- renderPlot({
-                                
-                                
-                                reTab.ssGSEAplot()
                                 generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                                
+                                })
+                                
                                 cat("--GSEAplot executed\n")
                                 
                         })           
