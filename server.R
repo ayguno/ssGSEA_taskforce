@@ -386,23 +386,26 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAplot
                         ###########################
-              
+                       observeEvent(c(input$fdr,input$feature),{
+                                fdr.cutoff <- input$FDR
+                                feature <- input$feature
+                                global.values$fdr.cutoff <- fdr.cutoff
+                                global.values$feature <- feature 
                         
                         
                         output$ssGSEAplot <- renderPlot({
                                 
-                        isolate({ 
-                                observeEvent(c(input$fdr,input$feature),{
-                                        fdr.cutoff <- input$FDR
-                                        feature <- input$feature
-                                        global.values$fdr.cutoff <- fdr.cutoff
-                                        global.values$feature <- feature
-
-                                                input.gct <- global.values$input.gct
-                                                results.gct <- global.values$results.gct
-                                                p.values.gct <- global.values$p.values.gct
-                                                fdr.gct <- global.values$fdr.gct
-                                       
+                               
+                                
+                                   isolate({
+                                           
+                                        
+                                              
+                                        input.gct <- global.values$input.gct
+                                        results.gct <- global.values$results.gct
+                                        p.values.gct <- global.values$p.values.gct
+                                        fdr.gct <- global.values$fdr.gct        
+                                    
                                         
                                         
                                         cat("--fdr cut off:", fdr.cutoff,"\n")
@@ -422,9 +425,8 @@ server<-function(input, output, session) {
                                         cat("--feature.index",feature.index,"\n")
                                         cat("--gene.set.index",gene.set.index,"\n")
                                         
-                                        
-                                        
-                                        
+                                       
+                                               
                                         feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
                                         feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
                                                                       NES = results.gct[gene.set.index,feature.index],
@@ -432,25 +434,22 @@ server<-function(input, output, session) {
                                                                       FDR = fdr.gct[gene.set.index,feature.index])
                                         
                                         feature.name <- names(input.gct)[1]
+                                       
+
                                         
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                },ignoreNULL = FALSE)
-                                
-                                generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
-                                
+
+     
                                 })
                                 
-                                cat("--GSEAplot executed\n")
+                                cat("--",feature.name,"\n") 
+                                cat("--",head(feature.exp),"\n") 
                                 
+                                generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                                cat("--GSEAplot executed\n")
                         })           
                         
                         
-                        
+                       },ignoreNULL = FALSE)
                         ###########################
                         # Prepare the ssGSEAheatmap
                         ###########################
