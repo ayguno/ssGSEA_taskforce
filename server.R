@@ -350,7 +350,7 @@ server<-function(input, output, session) {
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap"),
-                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.01,label = "FDR cutoff for Gene Sets:"),
+                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.2,label = "FDR cutoff for Gene Sets:"),
                                             selectInput("gene.set",choices = global.values$gene.sets,
                                                         selected = global.values$gene.sets[1:10], multiple = TRUE,
                                                         label = "Select genesets to filter:")
@@ -390,8 +390,12 @@ server<-function(input, output, session) {
                         # Prepare the ssGSEAplot
                         ###########################
                         
-                        observeEvent(input$FDR,{
-                                
+                        
+                        
+                        observeEvent(c(input$FDR,input$feature),{
+                                ######################################################################
+                                # Need to make this fully reactive to feature selection: input$feature
+                                #######################################################################
                                 withProgress(message = "Updating gene set selection ", value = 1, {
                                         
                                         fdr.cutoff <- input$FDR
@@ -400,13 +404,14 @@ server<-function(input, output, session) {
                                         
                                         updateSelectInput(session,inputId = "gene.set",
                                                           label = "Select genesets to filter:", 
-                                                          choices = new.gene.set)  
+                                                          choices = new.gene.set, selected = new.gene.set[1:10])  
                                 }) # End of withProgress
-                                
+
                         })
                         
                         
                        observeEvent(c(input$FDR,input$feature, input$gene.set),{
+                               
                                 
                                
                                fdr.cutoff <- input$FDR

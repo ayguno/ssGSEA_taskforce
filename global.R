@@ -93,7 +93,7 @@ geneset.subset <- genesets[geneset.names %in% feature.geneset$gset ]
 cc=0
 for(gs in seq_along(geneset.subset)){
         
-        ypos <- 1-cc*3/length(geneset.subset)
+        ypos <- 1-cc*1/length(geneset.subset)
         
         geneset.subset.genes <- geneset.subset[[gs]][-c(1,2)]
         ##########################################
