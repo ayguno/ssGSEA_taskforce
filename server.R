@@ -339,11 +339,7 @@ server<-function(input, output, session) {
                         )# End of renderUI
                         
                         output$sidebar <- renderUI(
-                                
-                                ##########################################
-                                #Need to add user inputs on the sidebar!!
-                                ##########################################
-                                
+
                                 sidebarMenu(id="tabitems",  
                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
