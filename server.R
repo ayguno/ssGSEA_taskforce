@@ -397,10 +397,14 @@ server<-function(input, output, session) {
                                         fdr.cutoff <- input$FDR
                                         feature.index <- which(names(fdr.gct) == global.values$feature)
                                         new.gene.set <- row.names(global.values$fdr.gct)[which(fdr.gct[,feature.index] < fdr.cutoff)]
+                                        display.length <- ifelse(length(new.gene.set)>10,10,length(new.gene.set))
+                                        
+                                        global.values$gene.set <- new.gene.set 
+                                        
                                         
                                         updateSelectInput(session,inputId = "gene.set",
                                                           label = "Select genesets to filter:", 
-                                                          choices = new.gene.set, selected = new.gene.set[1:10])  
+                                                          choices = new.gene.set, selected = new.gene.set[1:display.length])  
                                 }) # End of withProgress
 
                         })
