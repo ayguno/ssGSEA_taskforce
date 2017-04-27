@@ -281,7 +281,7 @@ server<-function(input, output, session) {
         # 
         #######################################################
         
-        observeEvent(global.values$task,
+        observeEvent(global.values$task,{
                 
                      ########################################
                      #
@@ -323,7 +323,7 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAheatmap tab
                                                         tabItem(tabName = "GSEAheatmap", 
-                                                                h5("GSEAheatmap will be here!"),
+                                                                
                                                                 box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
                                                                     
@@ -421,9 +421,9 @@ server<-function(input, output, session) {
                                global.values$feature <- feature 
                                    
                                        
-                              withProgress(expr= { 
+                          withProgress(expr= { 
                                
-                        output$ssGSEAplot <- renderPlot({
+                             output$ssGSEAplot <- renderPlot({
                                
                                    isolate({
                                         
@@ -438,12 +438,9 @@ server<-function(input, output, session) {
                                         
                                         
                                         cat("--fdr cut off:", fdr.cutoff,"\n")
-                                        cat("--feature selected:", feature,"\n")
-
-                                        
-                                        
-                                        
-                                        #Next, aim to make these two user-selectible, enable FDR filtering        
+                                        cat("--feature selected1:", feature,"\n")
+                                      
+                                        # these are two key user-selectible attributes, enable FDR filtering        
                                         ##################################################################        
                                         feature.index <- which(names(fdr.gct) == feature) # Only one value, selected feature
                                         gene.set.index <- which((fdr.gct[,feature.index] < fdr.cutoff) & (row.names(fdr.gct) %in% gene.set )) # Can be multiple values, selected genesets
@@ -472,97 +469,87 @@ server<-function(input, output, session) {
                                 cat("--GSEAplot executed\n")
                                 
                              
-                        })
-                              },message = "Preparing ssGSEAplot")
+                                })  # End of ssGSEAheatmap renderPlot
                         
-                        
-                       },ignoreNULL = FALSE) # End of c(input$fdr,input$feature) for the reactive ssGSEAplot
+                           },message = "Preparing ssGSEAplot")
+     
+                         },ignoreNULL = FALSE) # End of c(input$fdr,input$feature) for the reactive ssGSEAplot
                        
+                
                        
-                        ###########################
-                        # Prepare the ssGSEAheatmap
-                        ###########################
-                       
-                       observeEvent(c(input$FDR,input$features),{
-                               
-                               
-                               
-                               fdr.cutoff <- input$FDR
-                               features <- input$features
-                               global.values$fdr.cutoff <- fdr.cutoff
-                               global.values$features <- features 
-                               
-                               
-                               withProgress(expr= { 
-                       
-                       
-                       
-                        output$ssGSEAheatmap <- renderPlot({
-                                
-                                
-                                isolate({
-                                        
-                                        
-                                        input.gct <- global.values$input.gct
-                                        results.gct <- global.values$results.gct
-                                        p.values.gct <- global.values$p.values.gct
-                                        fdr.gct <- global.values$fdr.gct  
-                                        
-                                        cat("--fdr cut off:", fdr.cutoff,"\n")
-                                        cat("--feature selected:", feature,"\n")
-       
-                                        
-                                        #Next, aim to make these two user-selectible, enable FDR filtering        
-                                        ##################################################################        
-                                        if(features == "All samples"){
-                                                feature.index <- names(fdr.gct)
-                                        }else{
-                                                feature.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
-                                        }        
-                                        
-                                        ########################################################
-                                        # Pick any gene set if it is lower than the specified
-                                        # FDR cut off in any of the specified features
-                                        ########################################################
-                                        
-                                        
-                                        # Make the selection matrix
-                                        
-                                        temp.select <- apply(fdr.gct[,feature.index],2, function(x) x < fdr.cutoff)
-                                        temp.select.any <- apply( temp.select,1, function(x) any(x))
-                                        
-                                        gene.set.index <- which(temp.select.any) # Can be multiple values, selected genesets
-                                        ##################################################################
-                                        
-                                      
-                                        
-                                        
-                                        sub.results.gct <- results.gct[gene.set.index,feature.index]
-                                        
-                                        
-                                        
-                                        
-                                })
-                                
-                                
-                                generate.ssGSEAheatmap(sub.results.gct, cluster.rows = FALSE, 
-                                                       cluster.columns = FALSE, scale = "none",
-                                                       FDR.cut.off = fdr.cutoff)
-                                cat("--Heatmap executed\n")
-                                
-                                
-                        }) # End of ssGSEAheatmap renderPlot      
-            
-                        
-                        
-                        },message = "Preparing ssGSEAplot")
-                               
-                               
-                 },ignoreNULL = FALSE) # End of c(input$fdr,input$features) for the reactive ssGSEAheatmap
-                        
-                        
-                                    
-        })# End of analyze.GSEA.step2 observer
+             observeEvent(c(input$FDR,input$features),{ 
+                     
+                     
+                     
+                 output$ssGSEAheatmap <- renderPlot({
+                                 
+                                 
+                                 isolate({
+                                         
+                                         fdr.cutoff <- input$FDR
+                                         features <- input$features
+                                         global.values$fdr.cutoff <- fdr.cutoff
+                                         
+                                         
+                                         input.gct <- global.values$input.gct
+                                         results.gct <- global.values$results.gct
+                                         p.values.gct <- global.values$p.values.gct
+                                         fdr.gct <- global.values$fdr.gct
+   
+                                          
+                                         
+                                         cat("--fdr cut off:", fdr.cutoff,"\n")
+                                         cat("--feature selected2:", features,"\n")
+                                         
+                                         
+                                         #Next, aim to make these two user-selectible, enable FDR filtering        
+                                         ##################################################################        
+                                         if(features == "All samples"){
+                                                 features.index <- names(fdr.gct)[1:(length(names(fdr.gct))-1)]
+                                         }else{
+                                                 features.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
+                                         }        
+                                         
+                                         ########################################################
+                                         # Pick any gene set if it is lower than the specified
+                                         # FDR cut off in any of the specified features
+                                         ########################################################
+                                         
+                                         
+                                         # Make the selection matrix
+                                         
+                                         temp.select <- apply(fdr.gct[,features.index],2, function(x) x < fdr.cutoff)
+                                         temp.select.any <- apply( temp.select,1, function(x) any(x))
+                                         
+                                         gene.set.index <- which(temp.select.any) # Can be multiple values, selected genesets
+                                         ##################################################################
+                                         
+                                         
+                                         
+                                         
+                                         sub.results.gct <<- results.gct[gene.set.index,features.index]
+                                         
+                                         cat("--sub.results.gct nrows: ",nrow(sub.results.gct),"\n")
+                                         cat("--sub.results.gct ncols: ",ncol(sub.results.gct),"\n")
+                                         
+                                 })
+                                 
+                                 
+                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = FALSE, 
+                                                        cluster.columns = FALSE, scale = "none",
+                                                        FDR.cut.off = fdr.cutoff)
+                                 cat("--Heatmap executed\n")
+                                 
+                                 
+                         }) # End of ssGSEAheatmap renderPlot
+                         
+                   },ignoreNULL = FALSE) # End of c(input$fdr,input$features) for the reactive ssGSEAheatmap     
+                    
+                 
+                                 
+                }# End of: if(global.values$task == "analyze.GSEA.step2" )
+                
+        })# End of: analyze.GSEA.step2 observer
         
 
         
@@ -570,11 +557,5 @@ server<-function(input, output, session) {
         
         
         
-      
-        
-                        
-        
-         
-       
         
 }# End of server        
