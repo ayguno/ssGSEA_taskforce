@@ -483,13 +483,12 @@ server<-function(input, output, session) {
                         # Prepare the ssGSEAheatmap
                         ###########################
                        
-                       observeEvent(c(input$FDR,input$features, input$gene.set),{
+                       observeEvent(c(input$FDR,input$features),{
                                
                                
                                
                                fdr.cutoff <- input$FDR
                                features <- input$features
-                               gene.set <- input$gene.set 
                                global.values$fdr.cutoff <- fdr.cutoff
                                global.values$features <- features 
                                
@@ -526,25 +525,21 @@ server<-function(input, output, session) {
                                         # FDR cut off in any of the specified features
                                         ########################################################
                                         
-                                        gene.set.index <- which((fdr.gct[,feature.index] < fdr.cutoff) & (row.names(fdr.gct) %in% gene.set )) # Can be multiple values, selected genesets
+                                        
+                                        # Make the selection matrix
+                                        
+                                        temp.select <- apply(fdr.gct[,feature.index],2, function(x) x < fdr.cutoff)
+                                        temp.select.any <- apply( temp.select,1, function(x) any(x))
+                                        
+                                        gene.set.index <- which(temp.select.any) # Can be multiple values, selected genesets
                                         ##################################################################
                                         
-                                        cat("--feature.index",feature.index,"\n")
-                                        cat("--gene.set.index",gene.set.index,"\n")
-                                        
-                                        #Next, aim to make these two user-selectible, enable FDR filtering        
-                                        ##################################################################        
-                                        feature.index <- 1:(ncol(results.gct)-1) # Can be one value or all available features
-                                        gene.set.index <- 1:nrow(results.gct) # Can be multiple values, selected genesets
-                                        ##################################################################
-                                        
-                                        results.gct <- global.values$results.gct
-                                        fdr.gct <- global.values$fdr.gct
+                                      
                                         
                                         
                                         sub.results.gct <- results.gct[gene.set.index,feature.index]
                                         
-                                        FDR.cut.off <- ""
+                                        
                                         
                                         
                                 })
@@ -552,7 +547,7 @@ server<-function(input, output, session) {
                                 
                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = FALSE, 
                                                        cluster.columns = FALSE, scale = "none",
-                                                       FDR.cut.off = "")
+                                                       FDR.cut.off = fdr.cutoff)
                                 cat("--Heatmap executed\n")
                                 
                                 
