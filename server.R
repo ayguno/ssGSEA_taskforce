@@ -350,6 +350,7 @@ server<-function(input, output, session) {
                                             selectInput("gene.set",choices = global.values$gene.sets,
                                                         selected = global.values$gene.sets[1:10], multiple = TRUE,
                                                         label = "Select genesets to filter:")
+                                            
                                         )#End of sidebarMenu
                                 
                         )# End of renderUI
