@@ -327,8 +327,8 @@ server<-function(input, output, session) {
                                                                 box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
                                                                     
-                                                                    selectInput("features",choices = global.values$features,
-                                                                                selected = global.values$features[1:length(global.values$features)],
+                                                                    selectInput("features",choices = c("All samples",global.values$features),
+                                                                                selected = "All samples",
                                                                                 multiple = TRUE,label = "Select samples to display:",width = 300),
                                                                     
                                                                 plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
@@ -482,16 +482,55 @@ server<-function(input, output, session) {
                         ###########################
                         # Prepare the ssGSEAheatmap
                         ###########################
+                       
+                       observeEvent(c(input$FDR,input$features, input$gene.set),{
+                               
+                               
+                               
+                               fdr.cutoff <- input$FDR
+                               features <- input$features
+                               gene.set <- input$gene.set 
+                               global.values$fdr.cutoff <- fdr.cutoff
+                               global.values$features <- features 
+                               
+                               
+                               withProgress(expr= { 
+                       
+                       
+                       
                         output$ssGSEAheatmap <- renderPlot({
                                 
                                 
                                 isolate({
                                         
                                         
-                                        ####################
-                                        # Dev. purpose only
-                                        ####################
+                                        input.gct <- global.values$input.gct
+                                        results.gct <- global.values$results.gct
+                                        p.values.gct <- global.values$p.values.gct
+                                        fdr.gct <- global.values$fdr.gct  
                                         
+                                        cat("--fdr cut off:", fdr.cutoff,"\n")
+                                        cat("--feature selected:", feature,"\n")
+       
+                                        
+                                        #Next, aim to make these two user-selectible, enable FDR filtering        
+                                        ##################################################################        
+                                        if(features == "All samples"){
+                                                feature.index <- names(fdr.gct)
+                                        }else{
+                                                feature.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
+                                        }        
+                                        
+                                        ########################################################
+                                        # Pick any gene set if it is lower than the specified
+                                        # FDR cut off in any of the specified features
+                                        ########################################################
+                                        
+                                        gene.set.index <- which((fdr.gct[,feature.index] < fdr.cutoff) & (row.names(fdr.gct) %in% gene.set )) # Can be multiple values, selected genesets
+                                        ##################################################################
+                                        
+                                        cat("--feature.index",feature.index,"\n")
+                                        cat("--gene.set.index",gene.set.index,"\n")
                                         
                                         #Next, aim to make these two user-selectible, enable FDR filtering        
                                         ##################################################################        
@@ -517,10 +556,18 @@ server<-function(input, output, session) {
                                 cat("--Heatmap executed\n")
                                 
                                 
-                        })      
+                        }) # End of ssGSEAheatmap renderPlot      
+            
                         
-                }
-        )# End of analyze.GSEA.step2 observer
+                        
+                        },message = "Preparing ssGSEAplot")
+                               
+                               
+                 },ignoreNULL = FALSE) # End of c(input$fdr,input$features) for the reactive ssGSEAheatmap
+                        
+                        
+                                    
+        })# End of analyze.GSEA.step2 observer
         
 
         
