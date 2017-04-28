@@ -310,12 +310,19 @@ server<-function(input, output, session) {
                                                         
                                                         # GSEAplot tab
                                                         tabItem(tabName = "GSEAplot", 
-                                                                box(title="ssGSEAplot",status = "primary",solidHeader = TRUE,
+                                                                box(title="ssGSEAplot (adapted from Karsten Krug)",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
-                                                                    
+                                                             
+                                                                column(6,       
                                                                     selectInput("feature",choices = global.values$features,
                                                                                 selected = global.values$features[1],
-                                                                                label = "Select a sample to display:",width = 300),
+                                                                                label = "Select a sample to display:",width = 300)
+                                                                ),
+                                                                
+                                                                column(6,
+                                                                    h5("Do you like what you generated?"),
+                                                                    downloadButton(outputId = "download.ssGSEAplot",label = "Download PDF") 
+                                                                ),
                                                                 
                                                                 plotOutput(outputId = "ssGSEAplot", width = "100%", height = "800px")
                                                                 )
@@ -339,6 +346,7 @@ server<-function(input, output, session) {
                                                                 box(title="Clustering and scaling options",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 6, height = "100%",
                                                                     
+                                                                    column(6,
                                                                     radioButtons("cluster.columns",label = "Cluster samples(columns)?",
                                                                                  choices = c("No","Cluster columns"),
                                                                                  selected = "No"),
@@ -350,13 +358,24 @@ server<-function(input, output, session) {
                                                                     radioButtons("scaling",label = "Scale and center rows or columns?",
                                                                                  choices = c("none","row","column"),
                                                                                  selected = "none")
+                                                                    ),
+                                                                    
+                                                                    #column(1,{}),
+                                                        
+                                                                    column(6,
+                                                                            
+                                                                            h5("Do you like what you generated?"),
+                                                                            downloadButton(outputId = "download.heatmap",label = "Download PDF")    
+                                                                            
+                                                                    )
                                                                     
                                                                     ),
                                                                 
                                                                     br(),
                                                                 
-                                                                box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
+                                                                box(title="ssGSEAheatmap: Heatmap of Normalized Enrichment Scores",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 12, height = "100%",
+                                                                   
                                                                     plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
                                                                     )
                                                                 )# End of GSEAheatmap tab
@@ -555,7 +574,8 @@ server<-function(input, output, session) {
                         })        
                         
              observeEvent(c(input$FDR,input$features,input$gene.set,input$all.features,
-                            input$all.gene.sets,input$cluster.columns,input$cluster.rows),{ 
+                            input$all.gene.sets,input$cluster.columns,input$cluster.rows,
+                            input$scaling),{ 
                      
                      
                      
@@ -571,6 +591,7 @@ server<-function(input, output, session) {
                                          all.gene.sets <- input$all.gene.sets  
                                          cluster.columns <- ifelse(input$cluster.columns == "No" , FALSE, TRUE)
                                          cluster.rows <- ifelse(input$cluster.rows == "No" , FALSE, TRUE)
+                                         scaling <- input$scaling
                                          
                                          input.gct <- global.values$input.gct
                                          results.gct <- global.values$results.gct
@@ -624,7 +645,7 @@ server<-function(input, output, session) {
                                  
                                  
                                  generate.ssGSEAheatmap(sub.results.gct, cluster.rows = cluster.rows, 
-                                                        cluster.columns = cluster.columns, scale = "none",
+                                                        cluster.columns = cluster.columns, scale = scaling,
                                                         FDR.cut.off = fdr.cutoff)
                                  cat("--Heatmap executed\n")
                                  

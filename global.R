@@ -138,6 +138,7 @@ generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE,
         # FDR.cut.off: character vector specifying the FDR.cut.off applied by the user
         ################################################################################################## 
         x <- as.matrix(sub.results.gct) 
+        scaling <- scale
         
         trimmed.gene.set.names <- sapply(row.names(sub.results.gct), function(x){
                 if(nchar(x) <45){
@@ -150,16 +151,25 @@ generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE,
         row.names(x) <- trimmed.gene.set.names
         annt<-data.frame(Features = colnames(sub.results.gct))
         row.names(annt)<- colnames(sub.results.gct) #pheatmap requires the row names 
-        limits <- c(seq(min(x,na.rm = TRUE),0,length.out = 500),
+        limits <-  c(seq(min(x,na.rm = TRUE),0,length.out = 500),
                     seq(0.0001,(max(x,na.rm = TRUE)),length.out = 500))
         
         
         colfuncUPDN <- colorRampPalette(c("blue","white","Red"))
         
-        par(mar=c(1,20,2,7))
-        pheatmap(x, color=colfuncUPDN(1000), border_color = "white", cluster_rows = cluster.rows, scale = scale,
-                 cluster_cols = cluster.columns,fontsize_number = 3, fontsize_row = 10, breaks = limits, 
-                 fontsize_col = 10,annotation_col =annt,#annotation_colors = ann_colors, 
-                 na_col = "darkgray",treeheight_col =20, main = paste0("ssGSEA heatmap, FDR.p.val < ",FDR.cut.off))
+        if(scaling == "none"){
+                par(mar=c(1,20,2,7))
+                pheatmap(x, color=colfuncUPDN(1000), border_color = "white", cluster_rows = cluster.rows, scale = scale,
+                         cluster_cols = cluster.columns,fontsize_number = 3, fontsize_row = 10, breaks = limits, 
+                         fontsize_col = 10,annotation_col =annt,#annotation_colors = ann_colors, 
+                         na_col = "darkgray",treeheight_col =20, main = paste0("ssGSEA heatmap, FDR.p.val < ",FDR.cut.off))
+        }else{
+                par(mar=c(1,20,2,7))
+                pheatmap(x, color=colfuncUPDN(1000), border_color = "white", cluster_rows = cluster.rows, scale = scale,
+                         cluster_cols = cluster.columns,fontsize_number = 3, fontsize_row = 10,  
+                         fontsize_col = 10,annotation_col =annt,#annotation_colors = ann_colors, 
+                         na_col = "darkgray",treeheight_col =20, main = paste0("ssGSEA heatmap, FDR.p.val < ",FDR.cut.off))
+        }
+        
         
 }
