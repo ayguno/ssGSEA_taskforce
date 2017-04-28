@@ -402,7 +402,7 @@ server<-function(input, output, session) {
                                 withProgress(message = "Updating gene set selection ", value = 1, {
                                         
                                         fdr.cutoff <- input$FDR
-                                        feature.index <- which(names(fdr.gct) == global.values$feature)
+                                        feature.index <- which(names(fdr.gct) == input$feature)
                                         new.gene.set <- row.names(global.values$fdr.gct)[which(fdr.gct[,feature.index] < fdr.cutoff)]
                                         display.length <- ifelse(length(new.gene.set)>10,10,length(new.gene.set))
                                         
@@ -515,6 +515,21 @@ server<-function(input, output, session) {
                                
                        })   
                        
+                        observeEvent(input$all.features,{
+                                all.features <- input$all.features
+                                if(all.features == "Use all samples"){
+                                        
+                                        updateSelectInput(session, inputId = "features",choices = global.values$features,
+                                                    selected = NULL,label = "Select samples to display:")
+                                        
+                                }else{
+                                        updateSelectInput(session, inputId ="features",choices = global.values$features,
+                                                    selected = global.values$features[1:2],label = "Select samples to display:")
+                                                   
+                                }
+                                
+                        })        
+                        
              observeEvent(c(input$FDR,input$features,input$gene.set,input$all.features,input$all.gene.sets),{ 
                      
                      
