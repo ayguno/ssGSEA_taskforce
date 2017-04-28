@@ -324,19 +324,43 @@ server<-function(input, output, session) {
                                                         # GSEAheatmap tab
                                                         tabItem(tabName = "GSEAheatmap", 
                                                                 
-                                                                box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
-                                                                    background = "navy",width = 11, height = "100%",
+                                                                box(title="Sample selection",status = "primary",solidHeader = TRUE,
+                                                                    background = "navy",width = 6, height = "100%",
                                                                  
                                                                      radioButtons("all.features",label = "Which samples you want to use?",
                                                                                  choices = c("Use all samples","Filter samples below"),
                                                                                  selected = "Use all samples" ),
+                                                                    
                                                                      selectInput("features",choices = global.values$features,
                                                                                 selected = global.values$features[1:2],
-                                                                                multiple = TRUE,label = "Select samples to display:",width = 300),
-                        
+                                                                                multiple = TRUE,label = "Select samples to display:",width = 300)
+                                                                    ),
+                                                                
+                                                                box(title="Clustering and scaling options",status = "primary",solidHeader = TRUE,
+                                                                    background = "navy",width = 6, height = "100%",
+                                                                    
+                                                                    radioButtons("cluster.columns",label = "Cluster samples(columns)?",
+                                                                                 choices = c("No","Cluster columns"),
+                                                                                 selected = "No"),
+                                                                    
+                                                                    radioButtons("cluster.rows",label = "Cluster gene sets(rows)?",
+                                                                                 choices = c("No","Cluster rows"),
+                                                                                 selected = "No"),
+                                                                    
+                                                                    radioButtons("scaling",label = "Scale and center rows or columns?",
+                                                                                 choices = c("none","row","column"),
+                                                                                 selected = "none")
+                                                                    
+                                                                    ),
+                                                                
+                                                                    br(),
+                                                                
+                                                                box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
+                                                                    background = "navy",width = 12, height = "100%",
                                                                     plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
-                                                                )
-                                                        )# End of GSEAheatmap tab 
+                                                                    )
+                                                                )# End of GSEAheatmap tab
+                                                        
                                                 )
                                         
                         )# End of renderUI
@@ -530,7 +554,8 @@ server<-function(input, output, session) {
                                 
                         })        
                         
-             observeEvent(c(input$FDR,input$features,input$gene.set,input$all.features,input$all.gene.sets),{ 
+             observeEvent(c(input$FDR,input$features,input$gene.set,input$all.features,
+                            input$all.gene.sets,input$cluster.columns,input$cluster.rows),{ 
                      
                      
                      
@@ -544,6 +569,8 @@ server<-function(input, output, session) {
                                          features <- input$features
                                          global.values$fdr.cutoff <- fdr.cutoff
                                          all.gene.sets <- input$all.gene.sets  
+                                         cluster.columns <- ifelse(input$cluster.columns == "No" , FALSE, TRUE)
+                                         cluster.rows <- ifelse(input$cluster.rows == "No" , FALSE, TRUE)
                                          
                                          input.gct <- global.values$input.gct
                                          results.gct <- global.values$results.gct
@@ -596,8 +623,8 @@ server<-function(input, output, session) {
                                  })
                                  
                                  
-                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = FALSE, 
-                                                        cluster.columns = FALSE, scale = "none",
+                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = cluster.rows, 
+                                                        cluster.columns = cluster.columns, scale = "none",
                                                         FDR.cut.off = fdr.cutoff)
                                  cat("--Heatmap executed\n")
                                  
