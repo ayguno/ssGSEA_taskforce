@@ -326,12 +326,16 @@ server<-function(input, output, session) {
                                                                 
                                                                 box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
-                                                                    radioButtons("all.features",label = "Which samples you want to use?",
+                                                                 
+                                                                     radioButtons("all.features",label = "Which samples you want to use?",
                                                                                  choices = c("Use all samples","Filter samples below"),
                                                                                  selected = "Use all samples" ),
                                                                     selectInput("features",choices = global.values$features,
-                                                                                selected = global.values$features[1],
+                                                                                selected = global.values$features[1:2],
                                                                                 multiple = TRUE,label = "Select samples to display:",width = 300),
+                                                                 
+                                                                   
+                                                                   
                                                                     
                                                                 plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
                                                                 )
@@ -349,6 +353,9 @@ server<-function(input, output, session) {
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap"),
                                             sliderInput("FDR",max = 0.25, min = 0.001, value = 0.2,label = "FDR cutoff for Gene Sets:"),
+                                            radioButtons("all.gene.sets",label = "Which gene sets you want to use?",
+                                                         choices = c("Use selected gene sets","Use all genesets"),
+                                                         selected = "Use selected gene sets"),
                                             selectInput("gene.set",choices = global.values$gene.sets,
                                                         selected = global.values$gene.sets[1:10], multiple = TRUE,
                                                         label = "Select genesets to filter:")
@@ -413,7 +420,7 @@ server<-function(input, output, session) {
                         })
                         
                         
-                       observeEvent(c(input$FDR,input$feature, input$gene.set),{
+                       observeEvent(c(input$FDR,input$feature, input$gene.set,input$all.gene.sets ),{
                                
                                 
                                
@@ -422,7 +429,7 @@ server<-function(input, output, session) {
                                gene.set <- input$gene.set 
                                global.values$fdr.cutoff <- fdr.cutoff
                                global.values$feature <- feature 
-                                   
+                               all.gene.sets <- input$all.gene.sets    
                                        
                           withProgress(expr= { 
                                
@@ -446,7 +453,13 @@ server<-function(input, output, session) {
                                         # these are two key user-selectible attributes, enable FDR filtering        
                                         ##################################################################        
                                         feature.index <- which(names(fdr.gct) == feature) # Only one value, selected feature
-                                        gene.set.index <- which((fdr.gct[,feature.index] < fdr.cutoff) & (row.names(fdr.gct) %in% gene.set )) # Can be multiple values, selected genesets
+                                        
+                                        if(all.gene.sets == "Use all genesets"){
+                                                gene.set.index <- which(fdr.gct[,feature.index] < fdr.cutoff)         
+                                        } else{
+                                                gene.set.index <- which(row.names(fdr.gct) %in% gene.set ) # Can be multiple values, selected genesets
+                                        }
+                                        
                                         ##################################################################
                                         
                                         cat("--feature.index",feature.index,"\n")
@@ -505,7 +518,7 @@ server<-function(input, output, session) {
                                
                        })   
                        
-             observeEvent(c(input$FDR,input$features,input$gene.set),{ 
+             observeEvent(c(input$FDR,input$features,input$gene.set,input$all.features,input$all.gene.sets),{ 
                      
                      
                      
@@ -518,7 +531,7 @@ server<-function(input, output, session) {
                                          all.features <- input$all.features
                                          features <- input$features
                                          global.values$fdr.cutoff <- fdr.cutoff
-                                         
+                                         all.gene.sets <- input$all.gene.sets  
                                          
                                          input.gct <- global.values$input.gct
                                          results.gct <- global.values$results.gct
@@ -551,7 +564,13 @@ server<-function(input, output, session) {
                                          temp.select <- apply(fdr.gct[,features.index],2, function(x) x < fdr.cutoff)
                                          temp.select.any <- apply( temp.select,1, function(x) any(x))
                                          
-                                         gene.set.index <- which(temp.select.any | row.names(fdr.gct[,features.index]) %in% gene.set ) # Can be multiple values, selected genesets
+                                         if(all.gene.sets == "Use all genesets"){
+                                                 gene.set.index <- which(temp.select.any)         
+                                         } else{
+                                                 gene.set.index <- which(row.names(fdr.gct[,features.index]) %in% gene.set ) # Can be multiple values, selected genesets
+                                         }
+                                         
+                                          # Can be multiple values, selected genesets
                                          ##################################################################
                                          
                                          

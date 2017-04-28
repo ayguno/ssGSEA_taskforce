@@ -148,7 +148,7 @@ generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE,
         
         par(mar=c(1,20,2,7))
         pheatmap(x, color=colfuncUPDN(1000), border_color = "white", cluster_rows = cluster.rows,
-                 cluster_cols = cluster.columns,fontsize_number = 3, fontsize_row = 5, breaks = limits, 
+                 cluster_cols = cluster.columns,fontsize_number = 3, fontsize_row = 10, breaks = limits, 
                  fontsize_col = 10,annotation_col =annt,#annotation_colors = ann_colors, 
                  na_col = "darkgray",treeheight_col =20, main = paste0("ssGSEA heatmap, FDR.p.val < ",FDR.cut.off))
         
