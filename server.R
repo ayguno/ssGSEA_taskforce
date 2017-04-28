@@ -326,9 +326,11 @@ server<-function(input, output, session) {
                                                                 
                                                                 box(title="ssGSEAheatmap",status = "primary",solidHeader = TRUE,
                                                                     background = "navy",width = 11, height = "100%",
-                                                                    
-                                                                    selectInput("features",choices = c("All samples",global.values$features),
-                                                                                selected = "All samples",
+                                                                    radioButtons("all.features",label = "Which samples you want to use?",
+                                                                                 choices = c("Use all samples","Filter samples below"),
+                                                                                 selected = "Use all samples" ),
+                                                                    selectInput("features",choices = global.values$features,
+                                                                                selected = global.values$features[1],
                                                                                 multiple = TRUE,label = "Select samples to display:",width = 300),
                                                                     
                                                                 plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
@@ -476,9 +478,34 @@ server<-function(input, output, session) {
      
                          },ignoreNULL = FALSE) # End of c(input$fdr,input$feature) for the reactive ssGSEAplot
                        
-                
+                      
+                        observeEvent(c(input$FDR,input$features),{
+                               ######################################################################
+                               # Need to make this fully reactive to feature selection: input$feature
+                               #######################################################################
+                               withProgress(message = "Updating gene set selection ", value = 1, {
+                                       all.features <- input$all.features
+                                       features <- input$features
+                                       fdr.cutoff <- input$FDR
+                                       if(all.features == "Use all samples"){
+                                               features.index <- names(fdr.gct)[1:(length(names(fdr.gct))-1)]
+                                       }else{
+                                               features.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
+                                       }
+                                       new.gene.set <- row.names(global.values$fdr.gct)[which(fdr.gct[,features.index] < fdr.cutoff)]
+                                       display.length <- ifelse(length(new.gene.set)>10,10,length(new.gene.set))
+                                       
+                                       global.values$gene.set <- new.gene.set 
+                                       
+                                       
+                                       updateSelectInput(session,inputId = "gene.set",
+                                                         label = "Select genesets to filter:", 
+                                                         choices = new.gene.set, selected = new.gene.set[1:display.length])  
+                               }) # End of withProgress
+                               
+                       })   
                        
-             observeEvent(c(input$FDR,input$features),{ 
+             observeEvent(c(input$FDR,input$features,input$gene.set),{ 
                      
                      
                      
@@ -488,6 +515,7 @@ server<-function(input, output, session) {
                                  isolate({
                                          
                                          fdr.cutoff <- input$FDR
+                                         all.features <- input$all.features
                                          features <- input$features
                                          global.values$fdr.cutoff <- fdr.cutoff
                                          
@@ -496,16 +524,17 @@ server<-function(input, output, session) {
                                          results.gct <- global.values$results.gct
                                          p.values.gct <- global.values$p.values.gct
                                          fdr.gct <- global.values$fdr.gct
-   
+                                         gene.set <- input$gene.set
                                           
                                          
                                          cat("--fdr cut off:", fdr.cutoff,"\n")
                                          cat("--feature selected2:", features,"\n")
                                          
+                                         cat("--all.features:", all.features,"\n")
                                          
                                          #Next, aim to make these two user-selectible, enable FDR filtering        
                                          ##################################################################        
-                                         if(features == "All samples"){
+                                         if(all.features == "Use all samples"){
                                                  features.index <- names(fdr.gct)[1:(length(names(fdr.gct))-1)]
                                          }else{
                                                  features.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
@@ -516,13 +545,13 @@ server<-function(input, output, session) {
                                          # FDR cut off in any of the specified features
                                          ########################################################
                                          
-                                         
+                                         cat("--features index:", features.index,"\n")
                                          # Make the selection matrix
                                          
                                          temp.select <- apply(fdr.gct[,features.index],2, function(x) x < fdr.cutoff)
                                          temp.select.any <- apply( temp.select,1, function(x) any(x))
                                          
-                                         gene.set.index <- which(temp.select.any) # Can be multiple values, selected genesets
+                                         gene.set.index <- which(temp.select.any | row.names(fdr.gct[,features.index]) %in% gene.set ) # Can be multiple values, selected genesets
                                          ##################################################################
                                          
                                          
