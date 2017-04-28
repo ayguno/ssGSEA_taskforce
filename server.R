@@ -330,14 +330,11 @@ server<-function(input, output, session) {
                                                                      radioButtons("all.features",label = "Which samples you want to use?",
                                                                                  choices = c("Use all samples","Filter samples below"),
                                                                                  selected = "Use all samples" ),
-                                                                    selectInput("features",choices = global.values$features,
+                                                                     selectInput("features",choices = global.values$features,
                                                                                 selected = global.values$features[1:2],
                                                                                 multiple = TRUE,label = "Select samples to display:",width = 300),
-                                                                 
-                                                                   
-                                                                   
-                                                                    
-                                                                plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
+                        
+                                                                    plotOutput(outputId = "ssGSEAheatmap", width="100%", height = "700px")
                                                                 )
                                                         )# End of GSEAheatmap tab 
                                                 )
@@ -352,7 +349,7 @@ server<-function(input, output, session) {
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap"),
-                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.2,label = "FDR cutoff for Gene Sets:"),
+                                            sliderInput("FDR",max = 0.25, min = 0.001, value = 0.2,label = "Global FDR cutoff for Gene Sets:"),
                                             radioButtons("all.gene.sets",label = "Which gene sets you want to use?",
                                                          choices = c("Use selected gene sets","Use all genesets"),
                                                          selected = "Use selected gene sets"),
