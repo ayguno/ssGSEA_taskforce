@@ -137,7 +137,17 @@ generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE,
         # sub.results.gct: subset of results.gct based on user preferences (defaults to results.gct)
         # FDR.cut.off: character vector specifying the FDR.cut.off applied by the user
         ################################################################################################## 
-        x <- as.matrix(sub.results.gct); row.names(x) <- row.names(sub.results.gct)
+        x <- as.matrix(sub.results.gct) 
+        
+        trimmed.gene.set.names <- sapply(row.names(sub.results.gct), function(x){
+                if(nchar(x) <45){
+                        return(x)
+                }else{
+                        return(substr(x,1,45))
+                }
+        })
+        
+        row.names(x) <- trimmed.gene.set.names
         annt<-data.frame(Features = colnames(sub.results.gct))
         row.names(annt)<- colnames(sub.results.gct) #pheatmap requires the row names 
         limits <- c(seq(min(x,na.rm = TRUE),0,length.out = 500),
