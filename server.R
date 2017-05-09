@@ -77,12 +77,12 @@ server<-function(input, output, session) {
                             h6(icon("exclamation-triangle"),"First column (Name) must contain gene symbols."),
                         fluidRow(
                         column(6,        
-                            fileInput(inputId = "input.gct",width = '200px',
+                            fileInput(inputId = "input.gct.ssGSEA",width = '200px',
                                       label = "Select to upload your input.gct file:",
                                       multiple = FALSE, accept = ".gct")
                               ),column(6,
                                        br(),br(),
-                            actionButton(inputId = "run.ssGSEA", label = "Run ssGSEA")
+                            actionButton(inputId = "next.step", label = "Next step")
                               )
                         ),  
                             hr(),
@@ -185,18 +185,67 @@ server<-function(input, output, session) {
                 # Actual computation for ssGSEA
                 #
                 ##################################
-                observeEvent(input$run.ssGSEA,{
+                observeEvent(input$next.step,{
                         
-                        
-                        
-                        output$mainbody <- renderUI({                
-                                box(title= "Running ssGSEA with the selected parameters",status = "primary",solidHeader = TRUE,
-                                    background = "navy", width = 6, height = "100%",
-                                    h5("test")
-                                    
-                                )
+                        # Read input.gct
+                        if(!is.null(input$input.gct.ssGSEA) ){ 
                                 
-                        })
+                                # First check the file to decide if it is readable        
+                        
+                                line.input <- length(readLines(input$input.gct.ssGSEA$datapath))
+                               
+                                if( line.input < 4){
+                                        # If input doesn't make sense
+                                        # Throw an error to enforce user
+                                        # global.errors$analysis.step1 = "error"       
+                                }
+                                else{
+                                        # If input makes sense
+                                        
+                                        
+                                        ###########################
+                                        #
+                                        # Re-structure UI mainbody
+                                        #
+                                        ###########################
+                                        
+                                        output$mainbody <- renderUI({                
+                                                box(title= "Running ssGSEA with the selected parameters",status = "primary",
+                                                background = "navy", width = 12, height = "100%",
+                                                h5("test"),
+                                                actionButton(inputId = "run.ssGSEA",label = "Run ssGSEA")
+                                                )
+                                        
+                                    
+                                            
+      
+                                         })# End of renderUI
+                                         
+                                         eventReactive(input$run.ssGSEA,{
+                                                #############
+                                                # Run ssGSEA
+                                                #############
+                                                withProgress({
+                                                        
+                                                        # read expression input
+                                                        input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct.ssGSEA$datapath)$ds)
+                                                        
+                                                        ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
+                                                               'Combined_.gct_Results',
+                                                               gene.set.databases='./c2.all.v4.0.symbols.gmt',
+                                                               sample.norm.type="rank",
+                                                               weight=0,
+                                                               nperm=1000,
+                                                               min.overlap=10,
+                                                               correl.type='z.score')        
+                                                        
+                                                }, message = "Running ssGSEA, be patient...")
+                                                 
+                                         })        
+                                        
+                                } # end of: else line.input > 4 control
+                                
+                        }# end of: if(!is.null(input$input.gct) )       
                         
                 })
                 
