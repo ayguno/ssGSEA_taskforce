@@ -6,7 +6,7 @@
 APPNAME <- sub('.*/','',getwd())
 
 
-
+library(shinyjs)
 library(heatmaply)
 
 library(RColorBrewer)

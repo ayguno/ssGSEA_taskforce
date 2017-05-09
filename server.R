@@ -209,19 +209,27 @@ server<-function(input, output, session) {
                                         #
                                         ###########################
                                         
-                                        output$mainbody <- renderUI({                
+                                        output$mainbody <- renderUI({
+                                                fluidRow(shinyjs::useShinyjs(),
                                                 box(title= "Running ssGSEA with the selected parameters",status = "primary",
                                                 background = "navy", width = 12, height = "100%",
                                                 h5("test"),
                                                 actionButton(inputId = "run.ssGSEA",label = "Run ssGSEA")
-                                                )
                                         
-                                    
-                                            
+                                                
+                                                ),
+                                                column(3,{}),
+                                                
+                                                box(title= "Console",status = "primary",
+                                                    background = "navy", width = 6, height = 200,
+                                                textOutput("text")
+                                        
+                                                )
+                                                )
       
                                          })# End of renderUI
                                          
-                                         eventReactive(input$run.ssGSEA,{
+                                         observeEvent(input$run.ssGSEA,{
                                                 #############
                                                 # Run ssGSEA
                                                 #############
@@ -230,14 +238,24 @@ server<-function(input, output, session) {
                                                         # read expression input
                                                         input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct.ssGSEA$datapath)$ds)
                                                         
-                                                        ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
-                                                               'Combined_.gct_Results',
-                                                               gene.set.databases='./c2.all.v4.0.symbols.gmt',
-                                                               sample.norm.type="rank",
-                                                               weight=0,
-                                                               nperm=1000,
-                                                               min.overlap=10,
-                                                               correl.type='z.score')        
+                                                        
+                                                        withCallingHandlers({
+                                                                shinyjs::html("text", "")
+                                                            
+                                                                ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
+                                                                       'Combined_.gct_Results',
+                                                                       gene.set.databases='./c2.all.v4.0.symbols.gmt',
+                                                                       sample.norm.type="rank",
+                                                                       weight=0,
+                                                                       nperm=1000,
+                                                                       min.overlap=10,
+                                                                       correl.type='z.score')
+                                                        },
+                                                        message = function(m) {
+                                                                shinyjs::html(id = "text", html = m$message, add = TRUE)
+                                                        })
+                                                        
+                                                                
                                                         
                                                 }, message = "Running ssGSEA, be patient...")
                                                  

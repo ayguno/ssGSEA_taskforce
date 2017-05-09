@@ -3,8 +3,8 @@ library(shiny)
 library(shinydashboard)
 
 
-shinyUI( dashboardPage(skin = "red",
-      
+shinyUI( dashboardPage( skin = "red",
+                      
    dashboardHeader(title = "ssGSEA taskforce",
                 titleWidth = 300),
                        
@@ -24,7 +24,7 @@ shinyUI( dashboardPage(skin = "red",
    ########################################################################
    
    dashboardBody(
-   
+           
            uiOutput("mainbody")
                    
    )#End of dashboardBody
