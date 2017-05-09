@@ -201,7 +201,19 @@ server<-function(input, output, session) {
                                 }
                                 else{
                                         # If input makes sense
+                                        # read expression input and other parameters
+                                        input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct.ssGSEA$datapath)$ds)
                                         
+                                        output.prefix <- input$output.prefix
+                                        gene.set.databases <- input$gene.set.databases
+                                        gene.set.selection <- input$gene.set.selection
+                                        sample.norm.type <- input$sample.norm.type
+                                        weight <- input$weight
+                                        statistic <- input$statistic
+                                        output.score.type <- input$output.score.type
+                                        nperm <- input$nperm
+                                        correl.type <- input$correl.type
+                                        global.fdr <- input$global.fdr
                                         
                                         ###########################
                                         #
@@ -211,19 +223,38 @@ server<-function(input, output, session) {
                                         
                                         output$mainbody <- renderUI({
                                                 fluidRow(shinyjs::useShinyjs(),
-                                                box(title= "Running ssGSEA with the selected parameters",status = "primary",
+                                                box(title= "You are about to run ssGSEA with the selected parameters"
+                                                    ,status = "primary",
                                                 background = "navy", width = 12, height = "100%",
-                                                h5("test"),
+                                                
+                                        fluidRow(
+                                        column(6,        
+                                                h5(icon("tags"),"Project Name:",column(1,{}),output.prefix),
+                                                h5(icon("tags"),"Gene Set Database:",column(1,{}),gene.set.databases),
+                                                h5(icon("tags"),"Selected Gene Sets:",column(1,{}),gene.set.selection),
+                                                h5(icon("tags"),"Sample Normalization Type:",column(1,{}),sample.norm.type),
+                                                h5(icon("tags"),"Weight:",column(1,{}),weight),
+                                                h5(icon("tags"),"Test Statistic:",column(1,{}),statistic),
+                                                h5(icon("tags"),"Type of Output Score:",column(1,{}),output.score.type),
+                                                h5(icon("tags"),"Number of Permutations:",column(1,{}),nperm),
+                                                h5(icon("tags"),"Correlation Type:",column(1,{}),correl.type),
+                                                h5(icon("tags"),"FDR Calculation mode:",column(1,{}),global.fdr)
+                                        ), column(6, 
+                                                br(),br(),br(),
+                                                h4(icon("hourglass-start"), "Ready to start?"),
+                                                br(),
                                                 actionButton(inputId = "run.ssGSEA",label = "Run ssGSEA")
-                                        
+                                                )
+                                        )    
+                                                
                                                 
                                                 ),
                                                 column(2,{}),
                                                  
                                                 box(title= "Realtime ssGSEA Run Console",status = "primary",
-                                                     background = "navy", width =7, height = "100%",
+                                                     background = "navy", width =8, height = "100%",
                                                
-                                                wellPanel(id = "tPanel",style = "overflow-y:scroll; max-height: 400px",
+                                                wellPanel(id = "tPanel",style = "overflow-y:scroll; max-height: 300px",
                                                           textOutput("text",container = pre))
                                                  ),
                                                 column(2,{}) 
@@ -237,8 +268,8 @@ server<-function(input, output, session) {
                                                 #############
                                                 withProgress({
                                                         
-                                                        # read expression input
-                                                        input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct.ssGSEA$datapath)$ds)
+                                                        
+                                                        
                                                         
                                                         
                                                         withCallingHandlers({
