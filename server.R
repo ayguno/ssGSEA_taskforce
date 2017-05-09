@@ -75,9 +75,16 @@ server<-function(input, output, session) {
                             h4("Load your data and define parameters."),
                             
                             h6(icon("exclamation-triangle"),"First column (Name) must contain gene symbols."),
-                            fileInput(inputId = "input.gct",width = '400px',
+                        fluidRow(
+                        column(6,        
+                            fileInput(inputId = "input.gct",width = '200px',
                                       label = "Select to upload your input.gct file:",
-                                      multiple = FALSE),
+                                      multiple = FALSE, accept = ".gct")
+                              ),column(6,
+                                       br(),br(),
+                            actionButton(inputId = "run.ssGSEA", label = "Run ssGSEA")
+                              )
+                        ),  
                             hr(),
                             textInput(inputId = "output.prefix", width = "400px",
                                       label = "Enter prefix to be used for output tables:",
@@ -160,7 +167,7 @@ server<-function(input, output, session) {
                         
                    )        
                        
-                )# End of renderUI 
+                )# End of renderUI output$mainbody
                 
                 output$sidebar <- renderUI(
                         
@@ -170,14 +177,37 @@ server<-function(input, output, session) {
                                     
                                     
                         )#End of sidebarMenu
-                )# End of renderUI
+                )# End of renderUI output$sidebar
+                
+                
+                ##################################
+                #
+                # Actual computation for ssGSEA
+                #
+                ##################################
+                observeEvent(input$run.ssGSEA,{
+                        
+                        
+                        
+                        output$mainbody <- renderUI({                
+                                box(title= "Running ssGSEA with the selected parameters",status = "primary",solidHeader = TRUE,
+                                    background = "navy", width = 6, height = "100%",
+                                    h5("test")
+                                    
+                                )
+                                
+                        })
+                        
+                })
+                
+                
+                
                 
         })# End of link_to_run.GSEA observer                   
         
         
         
-        
-        
+       
         
         
         
