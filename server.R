@@ -218,13 +218,15 @@ server<-function(input, output, session) {
                                         
                                                 
                                                 ),
-                                                column(3,{}),
-                                                
-                                                box(title= "Console",status = "primary",
-                                                    background = "navy", width = 6, height = 200,
-                                                textOutput("text")
-                                        
-                                                )
+                                                column(2,{}),
+                                                 
+                                                box(title= "Realtime ssGSEA Run Console",status = "primary",
+                                                     background = "navy", width =7, height = "100%",
+                                               
+                                                wellPanel(id = "tPanel",style = "overflow-y:scroll; max-height: 400px",
+                                                          textOutput("text",container = pre))
+                                                 ),
+                                                column(2,{}) 
                                                 )
       
                                          })# End of renderUI
