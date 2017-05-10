@@ -771,7 +771,7 @@ server<-function(input, output, session) {
                                   },
                                   
                                   content = function(file){
-                                          pdf(file = file, width = 14, height = 14)
+                                          pdf(file = file, width = 12, height = 14)
                                           plotter() # Acccess plotter here to print into pdf device to reactive download
                                           dev.off()}
                                   
