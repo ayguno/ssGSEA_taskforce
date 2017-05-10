@@ -215,6 +215,8 @@ server<-function(input, output, session) {
                                         correl.type <- input$correl.type
                                         global.fdr <- input$global.fdr
                                         
+                                        user.directory <- paste(APPNAME,gsub(" |:|-","_",output.prefix),gsub(" |:|-","_",Sys.time()),sep = "_")
+                                        
                                         ###########################
                                         #
                                         # Re-structure UI mainbody
@@ -254,7 +256,9 @@ server<-function(input, output, session) {
                                                  
                                                 box(title= "Realtime ssGSEA Run Console",status = "primary",
                                                      background = "navy", width =8, height = "100%",
-                                               
+                                                
+                                                
+                                                    
                                                 wellPanel(id = "tPanel",style = "overflow-y:scroll; max-height: 300px",
                                                           textOutput("text",container = pre))
                                                  ),
@@ -264,18 +268,20 @@ server<-function(input, output, session) {
                                          })# End of renderUI
                                          
                                          observeEvent(input$run.ssGSEA,{
-                                                #############
-                                                # Run ssGSEA
-                                                #############
-                                                withProgress({
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
+                                                 
+                                                 #############
+                                                 # Run ssGSEA
+                                                 #############
+
+                                                 dir.create(paste0("./",user.directory))
+                                                 setwd(paste0("./",user.directory))
+                                                
+                                                 withProgress({
+
                                                         withCallingHandlers({
                                                                 shinyjs::html("text", "")
-                                                            
+                                                                
+                                                                message(paste("Your ssGSEA job ID is:",user.directory, "\n", sep = " "))
                                                                 # ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
                                                                 #        'Combined_.gct_Results',
                                                                 #        gene.set.databases='./c2.all.v4.0.symbols.gmt',
@@ -287,7 +293,7 @@ server<-function(input, output, session) {
                                                         ssGSEA(        
                                                                 input.ds = input$input.gct.ssGSEA$datapath,                      
                                                                 output.prefix = output.prefix,                
-                                                                gene.set.databases= './c2.all.v4.0.symbols.gmt',  
+                                                                gene.set.databases= '../c2.all.v4.0.symbols.gmt',  
                                                                 gene.set.selection  = gene.set.selection,  
                                                                 sample.norm.type    = sample.norm.type,  
                                                                 weight              = weight,      
@@ -300,6 +306,8 @@ server<-function(input, output, session) {
                                                                 fdr.pvalue          = TRUE,    
                                                                 global.fdr          = ifelse(global.fdr == "Calculate FDR sample-by-sample", FALSE,TRUE)    
                                                         )
+                                                        
+                                                        message(paste("Completed Job ID:",user.directory, "\n", sep = " "))
                                                                 
                                                         },
                                                         message = function(m) {
@@ -309,7 +317,9 @@ server<-function(input, output, session) {
                                                                 
                                                         
                                                 }, message = "Running ssGSEA, be patient...")
-                                                 
+                                              
+                                                setwd("../")
+                                                   
                                          })        
                                         
                                 } # end of: else line.input > 4 control
