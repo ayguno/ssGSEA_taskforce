@@ -667,9 +667,7 @@ server<-function(input, output, session) {
                         
                         
                         observeEvent(c(input$FDR,input$feature),{
-                                ######################################################################
-                                # Need to make this fully reactive to feature selection: input$feature
-                                #######################################################################
+                             
                                 withProgress(message = "Updating gene set selection ", value = 1, {
                                         
                                         fdr.cutoff <- input$FDR
@@ -705,67 +703,86 @@ server<-function(input, output, session) {
                                
                              output$ssGSEAplot <- renderPlot({
                                
-                                   isolate({
-                                        
-                                                  
-                                           
-                                           
-                                        input.gct <- global.values$input.gct
-                                        results.gct <- global.values$results.gct
-                                        p.values.gct <- global.values$p.values.gct
-                                        fdr.gct <- global.values$fdr.gct        
-                                    
-                                        
-                                        
-                                        cat("--fdr cut off:", fdr.cutoff,"\n")
-                                        cat("--feature selected1:", feature,"\n")
-                                      
-                                        # these are two key user-selectible attributes, enable FDR filtering        
-                                        ##################################################################        
-                                        feature.index <- which(names(fdr.gct) == feature) # Only one value, selected feature
-                                        
-                                        if(all.gene.sets == "Use all genesets"){
-                                                gene.set.index <- which(fdr.gct[,feature.index] < fdr.cutoff)         
-                                        } else{
-                                                gene.set.index <- which(row.names(fdr.gct) %in% gene.set ) # Can be multiple values, selected genesets
-                                        }
-                                        
-                                        ##################################################################
-                                        
-                                        cat("--feature.index",feature.index,"\n")
-                                        cat("--gene.set.index",gene.set.index,"\n")
-                                        
-                                       
-                                               
-                                        feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
-                                        feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
-                                                                      NES = results.gct[gene.set.index,feature.index],
-                                                                      P.value = p.values.gct[gene.set.index,feature.index],
-                                                                      FDR = fdr.gct[gene.set.index,feature.index])
-                                        
-                                        feature.name <- names(input.gct)[feature.index]
-
-     
-                                })
-                                
-                                cat("--",feature.name,"\n") 
-                                cat("--",head(feature.exp),"\n") 
-                                
-                                generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
-                                cat("--GSEAplot executed\n")
-                                
+                                   plotter <<- function(){  
+                                     
+                                                   isolate({
+                                                        
+                                                                  
+                                                           
+                                                           
+                                                        input.gct <- global.values$input.gct
+                                                        results.gct <- global.values$results.gct
+                                                        p.values.gct <- global.values$p.values.gct
+                                                        fdr.gct <- global.values$fdr.gct        
+                                                    
+                                                        
+                                                        
+                                                        cat("--fdr cut off:", fdr.cutoff,"\n")
+                                                        cat("--feature selected1:", feature,"\n")
+                                                      
+                                                        # these are two key user-selectible attributes, enable FDR filtering        
+                                                        ##################################################################        
+                                                        feature.index <- which(names(fdr.gct) == feature) # Only one value, selected feature
+                                                        
+                                                        if(all.gene.sets == "Use all genesets"){
+                                                                gene.set.index <- which(fdr.gct[,feature.index] < fdr.cutoff)         
+                                                        } else{
+                                                                gene.set.index <- which(row.names(fdr.gct) %in% gene.set ) # Can be multiple values, selected genesets
+                                                        }
+                                                        
+                                                        ##################################################################
+                                                        
+                                                        cat("--feature.index",feature.index,"\n")
+                                                        cat("--gene.set.index",gene.set.index,"\n")
+                                                        
+                                                       
+                                                               
+                                                        feature.exp <- input.gct[,feature.index]; names(feature.exp) <- row.names(input.gct)
+                                                        feature.geneset <- data.frame(gset = row.names(results.gct)[gene.set.index],
+                                                                                      NES = results.gct[gene.set.index,feature.index],
+                                                                                      P.value = p.values.gct[gene.set.index,feature.index],
+                                                                                      FDR = fdr.gct[gene.set.index,feature.index])
+                                                        
+                                                        feature.name <- names(input.gct)[feature.index]
+                
+                     
+                                                })
+                                                
+                                                cat("--",feature.name,"\n") 
+                                                cat("--",head(feature.exp),"\n") 
+                                                
+                                                generate.GSEAplot(feature.name,feature.exp,feature.geneset,genesets)
+                                                cat("--GSEAplot executed\n")
+                                   
+                                        }# End of the plotter() definition
+                                   
+                                   plotter() # Call plotter once to print the plot on the screen
+                                   
+                                   
                              
-                                })  # End of ssGSEAheatmap renderPlot
+                                })  # End of ssGSEAplot renderPlot
                         
                            },message = "Preparing ssGSEAplot")
+                          
+                          output$download.ssGSEAplot <- downloadHandler(
+                                  
+                                  filename = function(){
+                                          paste(APPNAME,"ssGSEAplot",gsub(" |:|-","_",Sys.time()),".pdf",sep = "_")
+                                  },
+                                  
+                                  content = function(file){
+                                          pdf(file = file)
+                                          plotter() # Acccess plotter here to print into pdf device to reactive download
+                                          dev.off()}
+                                  
+                                  
+                          )# End of the ssGSEA downloadhandler
      
                          },ignoreNULL = FALSE) # End of c(input$fdr,input$feature) for the reactive ssGSEAplot
                        
                       
                         observeEvent(c(input$FDR,input$features),{
-                               ######################################################################
-                               # Need to make this fully reactive to feature selection: input$feature
-                               #######################################################################
+                            
                                withProgress(message = "Updating gene set selection ", value = 1, {
                                        all.features <- input$all.features
                                        features <- input$features
@@ -802,7 +819,13 @@ server<-function(input, output, session) {
                                 }
                                 
                         })        
+             
                         
+                        
+                        ###########################
+                        # Prepare the ssGSEAheatmap
+                        ###########################           
+                                        
              observeEvent(c(input$FDR,input$features,input$gene.set,input$all.features,
                             input$all.gene.sets,input$cluster.columns,input$cluster.rows,
                             input$scaling),{ 
