@@ -223,9 +223,10 @@ server<-function(input, output, session) {
                                         
                                         output$mainbody <- renderUI({
                                                 fluidRow(shinyjs::useShinyjs(),
+                                                column(1,{}),         
                                                 box(title= "You are about to run ssGSEA with the selected parameters"
                                                     ,status = "primary",
-                                                background = "navy", width = 12, height = "100%",
+                                                background = "navy", width = 10, height = "100%",
                                                 
                                         fluidRow(
                                         column(6,        
