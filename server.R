@@ -771,7 +771,7 @@ server<-function(input, output, session) {
                                   },
                                   
                                   content = function(file){
-                                          pdf(file = file)
+                                          pdf(file = file, width = 14, height = 14)
                                           plotter() # Acccess plotter here to print into pdf device to reactive download
                                           dev.off()}
                                   
@@ -834,76 +834,95 @@ server<-function(input, output, session) {
                      
                  output$ssGSEAheatmap <- renderPlot({
                                  
+                         heatmapper <<- function(){  
                                  
-                                 isolate({
-                                         
-                                         fdr.cutoff <- input$FDR
-                                         all.features <- input$all.features
-                                         features <- input$features
-                                         global.values$fdr.cutoff <- fdr.cutoff
-                                         all.gene.sets <- input$all.gene.sets  
-                                         cluster.columns <- ifelse(input$cluster.columns == "No" , FALSE, TRUE)
-                                         cluster.rows <- ifelse(input$cluster.rows == "No" , FALSE, TRUE)
-                                         scaling <- input$scaling
-                                         
-                                         input.gct <- global.values$input.gct
-                                         results.gct <- global.values$results.gct
-                                         p.values.gct <- global.values$p.values.gct
-                                         fdr.gct <- global.values$fdr.gct
-                                         gene.set <- input$gene.set
-                                          
-                                         
-                                         cat("--fdr cut off:", fdr.cutoff,"\n")
-                                         cat("--feature selected2:", features,"\n")
-                                         
-                                         cat("--all.features:", all.features,"\n")
-                                         
-                                         #Next, aim to make these two user-selectible, enable FDR filtering        
-                                         ##################################################################        
-                                         if(all.features == "Use all samples"){
-                                                 features.index <- names(fdr.gct)[1:(length(names(fdr.gct))-1)]
-                                         }else{
-                                                 features.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
-                                         }        
-                                         
-                                         ########################################################
-                                         # Pick any gene set if it is lower than the specified
-                                         # FDR cut off in any of the specified features
-                                         ########################################################
-                                         
-                                         cat("--features index:", features.index,"\n")
-                                         # Make the selection matrix
-                                         
-                                         temp.select <- apply(fdr.gct[,features.index],2, function(x) x < fdr.cutoff)
-                                         temp.select.any <- apply( temp.select,1, function(x) any(x))
-                                         
-                                         if(all.gene.sets == "Use all genesets"){
-                                                 gene.set.index <- which(temp.select.any)         
-                                         } else{
-                                                 gene.set.index <- which(row.names(fdr.gct[,features.index]) %in% gene.set ) # Can be multiple values, selected genesets
-                                         }
-                                         
-                                          # Can be multiple values, selected genesets
-                                         ##################################################################
-                                         
-                                         
-                                         
-                                         
-                                         sub.results.gct <<- results.gct[gene.set.index,features.index]
-                                         
-                                         cat("--sub.results.gct nrows: ",nrow(sub.results.gct),"\n")
-                                         cat("--sub.results.gct ncols: ",ncol(sub.results.gct),"\n")
-                                         
-                                 })
+                                                 isolate({
+                                                         
+                                                         fdr.cutoff <- input$FDR
+                                                         all.features <- input$all.features
+                                                         features <- input$features
+                                                         global.values$fdr.cutoff <- fdr.cutoff
+                                                         all.gene.sets <- input$all.gene.sets  
+                                                         cluster.columns <- ifelse(input$cluster.columns == "No" , FALSE, TRUE)
+                                                         cluster.rows <- ifelse(input$cluster.rows == "No" , FALSE, TRUE)
+                                                         scaling <- input$scaling
+                                                         
+                                                         input.gct <- global.values$input.gct
+                                                         results.gct <- global.values$results.gct
+                                                         p.values.gct <- global.values$p.values.gct
+                                                         fdr.gct <- global.values$fdr.gct
+                                                         gene.set <- input$gene.set
+                                                          
+                                                         
+                                                         cat("--fdr cut off:", fdr.cutoff,"\n")
+                                                         cat("--feature selected2:", features,"\n")
+                                                         
+                                                         cat("--all.features:", all.features,"\n")
+                                                         
+                                                         #Next, aim to make these two user-selectible, enable FDR filtering        
+                                                         ##################################################################        
+                                                         if(all.features == "Use all samples"){
+                                                                 features.index <- names(fdr.gct)[1:(length(names(fdr.gct))-1)]
+                                                         }else{
+                                                                 features.index <- which(names(fdr.gct) %in% features) # Can be one value or all available features  
+                                                         }        
+                                                         
+                                                         ########################################################
+                                                         # Pick any gene set if it is lower than the specified
+                                                         # FDR cut off in any of the specified features
+                                                         ########################################################
+                                                         
+                                                         cat("--features index:", features.index,"\n")
+                                                         # Make the selection matrix
+                                                         
+                                                         temp.select <- apply(fdr.gct[,features.index],2, function(x) x < fdr.cutoff)
+                                                         temp.select.any <- apply( temp.select,1, function(x) any(x))
+                                                         
+                                                         if(all.gene.sets == "Use all genesets"){
+                                                                 gene.set.index <- which(temp.select.any)         
+                                                         } else{
+                                                                 gene.set.index <- which(row.names(fdr.gct[,features.index]) %in% gene.set ) # Can be multiple values, selected genesets
+                                                         }
+                                                         
+                                                          # Can be multiple values, selected genesets
+                                                         ##################################################################
+                                                         
+                                                         
+                                                         
+                                                         
+                                                         sub.results.gct <<- results.gct[gene.set.index,features.index]
+                                                         
+                                                         cat("--sub.results.gct nrows: ",nrow(sub.results.gct),"\n")
+                                                         cat("--sub.results.gct ncols: ",ncol(sub.results.gct),"\n")
+                                                         
+                                                 })
+                                                 
+                                                 
+                                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = cluster.rows, 
+                                                                        cluster.columns = cluster.columns, scale = scaling,
+                                                                        FDR.cut.off = fdr.cutoff)
+                                                 cat("--Heatmap executed\n")
                                  
-                                 
-                                 generate.ssGSEAheatmap(sub.results.gct, cluster.rows = cluster.rows, 
-                                                        cluster.columns = cluster.columns, scale = scaling,
-                                                        FDR.cut.off = fdr.cutoff)
-                                 cat("--Heatmap executed\n")
-                                 
+                         } #End of the heatmapper() definition 
+                         
+                         heatmapper() # Call heatmapper() to generate the heatmap on the screen
                                  
                          }) # End of ssGSEAheatmap renderPlot
+                 
+                 output$download.heatmap <- downloadHandler(
+                         
+                         filename = function(){
+                                 paste(APPNAME,"ssGSEAheatmap",gsub(" |:|-","_",Sys.time()),".pdf",sep = "_")
+                         },
+                         
+                         content = function(file){
+                                 pdf(file = file, width = 18, height = 10)
+                                 heatmapper() # Acccess heatmapper here to print into pdf device to reactive download
+                                 dev.off()}
+                         
+                         
+                 )# End of the ssGSEA heatmap downloadhandler
+                         
                          
                    },ignoreNULL = FALSE) # End of c(input$fdr,input$features) for the reactive ssGSEAheatmap     
                     
