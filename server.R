@@ -144,7 +144,7 @@ server<-function(input, output, session) {
                                         selected = "NES",choices = c("ES","NES")),
                             sliderInput(inputId = "nperm", width = "400px",
                                         label = "For NES output: number of random permutations",
-                                        min = 100, max = 1000, value = 100),
+                                        min = 100, max = 1000, value = 1000),
                             hr(),
                             h6(icon("exclamation-triangle"),"combine.off: do not combine *_UP and *_DN versions in a single score",br(),
                                "combine.replace: combine *_UP and *_DN versions in a single score",br(),
@@ -276,14 +276,31 @@ server<-function(input, output, session) {
                                                         withCallingHandlers({
                                                                 shinyjs::html("text", "")
                                                             
-                                                                ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
-                                                                       'Combined_.gct_Results',
-                                                                       gene.set.databases='./c2.all.v4.0.symbols.gmt',
-                                                                       sample.norm.type="rank",
-                                                                       weight=0,
-                                                                       nperm=1000,
-                                                                       min.overlap=10,
-                                                                       correl.type='z.score')
+                                                                # ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
+                                                                #        'Combined_.gct_Results',
+                                                                #        gene.set.databases='./c2.all.v4.0.symbols.gmt',
+                                                                #        sample.norm.type="rank",
+                                                                #        weight=0,
+                                                                #        nperm=1000,
+                                                                #        min.overlap=10,
+                                                                #        correl.type='z.score')
+                                                        ssGSEA(        
+                                                                input.ds = input$input.gct.ssGSEA$datapath,                      
+                                                                output.prefix = output.prefix,                
+                                                                gene.set.databases= './c2.all.v4.0.symbols.gmt',  
+                                                                gene.set.selection  = gene.set.selection,  
+                                                                sample.norm.type    = sample.norm.type,  
+                                                                weight              = weight,      
+                                                                statistic           = statistic,
+                                                                output.score.type   = output.score.type,   
+                                                                nperm               = nperm,    
+                                                                combine.mode        = combine.mode,  
+                                                                min.overlap         = 10,
+                                                                correl.type         = correl.type, 
+                                                                fdr.pvalue          = TRUE,    
+                                                                global.fdr          = ifelse(global.fdr == "Calculate FDR sample-by-sample", FALSE,TRUE)    
+                                                        )
+                                                                
                                                         },
                                                         message = function(m) {
                                                                 shinyjs::html(id = "text", html = m$message, add = TRUE)
