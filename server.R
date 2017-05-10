@@ -272,6 +272,10 @@ server<-function(input, output, session) {
                                                  #############
                                                  # Run ssGSEA
                                                  #############
+                                                 
+                                                 ###################################################
+                                                 # Next step: configure e-mail interaction with user
+                                                 ###################################################
 
                                                  dir.create(paste0("./",user.directory))
                                                  setwd(paste0("./",user.directory))

@@ -5,7 +5,7 @@
 ## app name
 APPNAME <- sub('.*/','',getwd())
 
-
+library(sendmailR)
 library(shinyjs)
 library(heatmaply)
 
