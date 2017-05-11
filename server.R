@@ -89,8 +89,13 @@ server<-function(input, output, session) {
                                                       )
                                                 ),  
                                                     hr(),
+                                                    h6(icon("exclamation-triangle"),"Your results can be e-mailed to you."), 
+                                                    textInput(inputId = "email.address", width = "400px",
+                                                          label = "Provide a valid e-mail address:"),
+                                                          
+                                                    hr(),
                                                     textInput(inputId = "output.prefix", width = "400px",
-                                                              label = "Enter prefix to be used for output tables:",
+                                                              label = "Give a name for your project:",
                                                               value = "My.ssGSEA.Output"),
                                                     hr(),
                                                     h6(icon("exclamation-triangle"),"Currently defaults to: MSigDB C2."),
@@ -280,25 +285,6 @@ server<-function(input, output, session) {
                                          })# End of renderUI mainbody
                                          
                                         
-                                         output$sidebar <- renderUI(
-                                        
-                                                 sidebarMenu(id="tabitems",
-                                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),
-                                                             br(),br(),br(),
-                                                             # Giving the option for user to go back to parameter definition
-                                                             # Test using tabItem structure!!!
-                                                              actionLink("link_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
-                                        
-                                        
-                                                 )#End of sidebarMenu
-                                         )# End of renderUI output$sidebar
-                                        
-                                         # Box link for back to run.GSEA
-                                         output$back.run.GSEA.box <-renderUI({
-                                                 valueBox(value="Back",color = "purple", icon = icon("step-backward"),
-                                                          subtitle = "Need to refine parameters?", width = 12)
-                                         })
                                         
 
                                         
