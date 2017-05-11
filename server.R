@@ -310,12 +310,14 @@ server<-function(input, output, session) {
                                                                 
                                                                 message(paste("Your ssGSEA job ID is:",user.directory, "\n", sep = " "))
                                                                 
-                                                                if(!is.null(user.email)){
+                                                               
+                                                                
+                                                                if(nchar(user.email) != 0){
                                                                 message(paste("Your ssGSEA results will be e-mailed to: ",user.email, "\n", sep = " "))
                                                                 to <- user.email
                                                                 subject <- paste0("Your ssGSEA job ",user.directory," is submitted")
                                                                 body <- paste0("You are receiving this message because you just started a new job in ssGSEA taskforce.\n\n Your Job ID is: ", 
-                                                                               user.directory,"\n\n Once completed, your results will be e-mailed to you.\n\n\n Thank you for using ssGSEA Taskforce")
+                                                                               user.directory,"\n\n Once completed, your results will be e-mailed to you.\n\n\n Thank you for using ssGSEA Taskforce!")
 
                                                                 email.to.user(to,subject,body)
                                                                         
@@ -348,8 +350,14 @@ server<-function(input, output, session) {
                                                         
                                                         message(paste("Completed Job ID:",user.directory, "\n", sep = " "))
                                                         
-                                                        if(!is.null(user.email)){
-                                                                message(paste("E-mailing your ssGSEA results to:",user.e-mail, "\n", sep = " "))        
+                                                        if(nchar(user.email) != 0){
+                                                                message(paste("E-mailing your ssGSEA results to:",user.e-mail, "\n", sep = " "))
+                                                                to <- user.email
+                                                                subject <- paste0("Your ssGSEA job: ",user.directory," is completed")
+                                                                body <- paste0("You are receiving this message because you previously started a new job in ssGSEA taskforce.\n\n Your Job ID is: ", 
+                                                                               user.directory,"\n\n Your job has been completed, please find your results enclosed.\n\n\n Thank you for using ssGSEA Taskforce!")
+                                                                
+                                                                email.results.to.user(to,subject,message.body)
                                                         }        
                                                         
                                                         },
