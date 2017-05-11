@@ -175,5 +175,15 @@ generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE,
 }
 
 
+######################################
+# User Email Communication
+######################################
 
-
+email.to.user <- function(to,subject,body){
+        
+        from <- sprintf("<ssGSEA.taskforce@\\%s>", Sys.info()[4])
+        subject <- "Hello from R"
+        body <- list("It works!", mime_part(iris))
+        sendmail(from, to, subject, body,
+                 control=list(smtpServer="ASPMX.L.GOOGLE.COM"))
+} 

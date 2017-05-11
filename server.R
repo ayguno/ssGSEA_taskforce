@@ -232,6 +232,8 @@ server<-function(input, output, session) {
                                         
                                         user.directory <- paste(APPNAME,gsub(" |:|-","_",output.prefix),gsub(" |:|-","_",Sys.time()),sep = "_")
                                         
+                                        
+                                        user.email <- input$email.address
                                         ###########################
                                         #
                                         # Re-structure UI 
@@ -307,6 +309,11 @@ server<-function(input, output, session) {
                                                                 shinyjs::html("text", "")
                                                                 
                                                                 message(paste("Your ssGSEA job ID is:",user.directory, "\n", sep = " "))
+                                                                
+                                                                if(!is.null(user.email)){
+                                                                message(paste("Your ssGSEA results will be e-mailed to:",user.e-mail, "\n", sep = " "))        
+                                                                }
+                                                                
                                                                 # ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
                                                                 #        'Combined_.gct_Results',
                                                                 #        gene.set.databases='./c2.all.v4.0.symbols.gmt',
@@ -333,7 +340,11 @@ server<-function(input, output, session) {
                                                         )
                                                         
                                                         message(paste("Completed Job ID:",user.directory, "\n", sep = " "))
-                                                                
+                                                        
+                                                        if(!is.null(user.email)){
+                                                                message(paste("E-mailing your ssGSEA results to:",user.e-mail, "\n", sep = " "))        
+                                                        }        
+                                                        
                                                         },
                                                         message = function(m) {
                                                                 shinyjs::html(id = "text", html = m$message, add = TRUE)
