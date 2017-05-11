@@ -66,118 +66,127 @@ server<-function(input, output, session) {
         })
         
         # Actual observer for run.GSEA
-        observeEvent(input$link_to_run.GSEA, {
+        observeEvent(c(input$link_to_run.GSEA), {
                 global.values$task = "run.GSEA"
-                output$mainbody <- renderUI(
-                   fluidRow(     
-                        box(title = "Welcome to ssGSEA run wizard!",status = "primary",
-                            background = "navy", width = 6, height = "100%",
-                            h4("Load your data and define parameters."),
-                            
-                            h6(icon("exclamation-triangle"),"First column (Name) must contain gene symbols."),
-                        fluidRow(
-                        column(6,        
-                            fileInput(inputId = "input.gct.ssGSEA",width = '200px',
-                                      label = "Select to upload your input.gct file:",
-                                      multiple = FALSE, accept = ".gct")
-                              ),column(6,
-                                       br(),br(),
-                            actionButton(inputId = "next.step", label = "Next step")
-                              )
-                        ),  
-                            hr(),
-                            textInput(inputId = "output.prefix", width = "400px",
-                                      label = "Enter prefix to be used for output tables:",
-                                      value = "My.ssGSEA.Output"),
-                            hr(),
-                            h6(icon("exclamation-triangle"),"Currently defaults to: MSigDB C2."),
-                            selectInput(inputId = "gene.set.databases", width = "400px",
-                                        label = "List of genesets (in gmt format) to evaluate enrichment on",
-                                        selected = 'c2.all.v4.0.symbols.gmt',choices = 'c2.all.v4.0.symbols.gmt' ),
-                            hr(),
-                            h6(icon("exclamation-triangle"),"By default it will include ALL gene sets available."),
-                            textAreaInput(inputId  = "gene.set.selection", width = "400px",
-                                          label = "List with names of gene sets",
-                                          value = "ALL"),
-                            hr(),
-                            selectInput(inputId = "sample.norm.type", width = "400px",
-                                        label = "Sample Normalization Type",
-                                        selected = "rank", choices = c("rank", "log", "log.rank","none")),
-                            hr(),
-                            h6(icon("exclamation-triangle"),"When weight is equal to 0, all genes have the same weight; if weight is >0, 
-                               actual values matter, and can change the resulting score"),
-                            numericInput(inputId = "weight", width = "100px",
-                                         label = "Weight", value = 0)
-
-                        ), # End of the "Welcome to ssGSEA run wizard!" box
-                        
-                        box(title = "Tips for running ssGSEA:Click Here ->",status = "success",
-                            background = "navy", width = 6, height = "100%",collapsible = TRUE,
-                            collapsed = TRUE,
-                            
-                            h5("For results similar to the Java version:Use weight=0"),
-                            h5(icon("exclamation-triangle"),"when weight=0, sample.norm.type and correl.type do not matter"),
-                            h5(icon("exclamation-triangle"),"when weight > 0, the combination of sample.norm.type and correl.type
-                                   dictate how the gene expression values in input.ds are transformed
-                                   to obtain the score -- use this setting with care (the transformations
-                                   can skew scores towards +ve or -ve values)"),
-                            h5(icon("thumbs-o-up"),"sample.norm.type='none' uses actual expression values; 
-                               combined with correl.type ='rank', genes are weighted by actual values"),
-                            h5(icon("thumbs-o-up"),"sample.norm.type ='rank' weights genes proportional to rank"),
-                            h5(icon("thumbs-o-up"),"sample.norm.type ='log' can be used for log-transforming input data"),
-                            h5(icon("thumbs-o-up"),"correl.type ='z.score' standardizes the (normalized) input values before using them to calculate scores")
-                          
-                                
-                        ),
-                        
-                        box(status = "primary",solidHeader = FALSE,
-                            background = "navy", width = 6, height = "100%",
-                            
-                            selectInput(inputId = "statistic", width = "400px",
-                                        label = "Test statistic",
-                                        selected = "area.under.RES", 
-                                        choices = c("Kolmogorov-Smirnov", "area.under.RES")),
-                            hr(),
-                            h6(icon("exclamation-triangle"),"ES: Enrichment Score",br(),"NES: Normalized Enrichment Score"),
-                            selectInput(inputId = "output.score.type", width = "400px",
-                                        label = "Output score type",
-                                        selected = "NES",choices = c("ES","NES")),
-                            sliderInput(inputId = "nperm", width = "400px",
-                                        label = "For NES output: number of random permutations",
-                                        min = 100, max = 1000, value = 1000),
-                            hr(),
-                            h6(icon("exclamation-triangle"),"combine.off: do not combine *_UP and *_DN versions in a single score",br(),
-                               "combine.replace: combine *_UP and *_DN versions in a single score",br(),
-                               "combine.add: combine *_UP and *_DN versions in a single score and add it but keeping the individual *_UP and *_DN versions."),
-                            selectInput(inputId = "combine.mode",width = "200px",
-                                        label = "Combination Mode", selected = "combine.off",
-                                        choices = c("combine.off", "combine.replace", "combine.add")
-                                        ),
-                            hr(),
-                            selectInput(inputId = "correl.type", label = "Correlation type",width = "200px",
-                                        selected = "rank", choices = c("rank", "z.score", "symm.rank")),
-                            hr(),
-                            radioButtons(inputId = "global.fdr",label = "FDR adjustment", 
-                                         choices = c("Calculate FDR sample-by-sample",
-                                                     "Calculate global FDR"),
-                                         selected = "Calculate FDR sample-by-sample")
-                            
-                                
-                        )
-                        
-                   )        
-                       
-                )# End of renderUI output$mainbody
                 
-                output$sidebar <- renderUI(
+               
                         
-                        sidebarMenu(id="tabitems",  
-                                    h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
-                                    
-                                    
-                        )#End of sidebarMenu
-                )# End of renderUI output$sidebar
+                                        output$mainbody <- renderUI(
+                                           fluidRow(     
+                                                box(title = "Welcome to ssGSEA run wizard!",status = "primary",
+                                                    background = "navy", width = 6, height = "100%",
+                                                    h4("Load your data and define parameters."),
+                                                    
+                                                    h6(icon("exclamation-triangle"),"First column (Name) must contain gene symbols."),
+                                                fluidRow(
+                                                column(6,        
+                                                    fileInput(inputId = "input.gct.ssGSEA",width = '200px',
+                                                              label = "Select to upload your input.gct file:",
+                                                              multiple = FALSE, accept = ".gct")
+                                                      ),column(6,
+                                                               br(),br(),
+                                                    actionButton(inputId = "next.step", label = "Next step")
+                                                      )
+                                                ),  
+                                                    hr(),
+                                                    textInput(inputId = "output.prefix", width = "400px",
+                                                              label = "Enter prefix to be used for output tables:",
+                                                              value = "My.ssGSEA.Output"),
+                                                    hr(),
+                                                    h6(icon("exclamation-triangle"),"Currently defaults to: MSigDB C2."),
+                                                    selectInput(inputId = "gene.set.databases", width = "400px",
+                                                                label = "List of genesets (in gmt format) to evaluate enrichment on",
+                                                                selected = 'c2.all.v4.0.symbols.gmt',choices = 'c2.all.v4.0.symbols.gmt' ),
+                                                    hr(),
+                                                    h6(icon("exclamation-triangle"),"By default it will include ALL gene sets available."),
+                                                    textAreaInput(inputId  = "gene.set.selection", width = "400px",
+                                                                  label = "List with names of gene sets",
+                                                                  value = "ALL"),
+                                                    hr(),
+                                                    selectInput(inputId = "sample.norm.type", width = "400px",
+                                                                label = "Sample Normalization Type",
+                                                                selected = "rank", choices = c("rank", "log", "log.rank","none")),
+                                                    hr(),
+                                                    h6(icon("exclamation-triangle"),"When weight is equal to 0, all genes have the same weight; if weight is >0, 
+                                                       actual values matter, and can change the resulting score"),
+                                                    numericInput(inputId = "weight", width = "100px",
+                                                                 label = "Weight", value = 0)
+                        
+                                                ), # End of the "Welcome to ssGSEA run wizard!" box
+                                                
+                                                box(title = "Tips for running ssGSEA:Click Here ->",status = "success",
+                                                    background = "navy", width = 6, height = "100%",collapsible = TRUE,
+                                                    collapsed = TRUE,
+                                                    
+                                                    h5("For results similar to the Java version:Use weight=0"),
+                                                    h5(icon("exclamation-triangle"),"when weight=0, sample.norm.type and correl.type do not matter"),
+                                                    h5(icon("exclamation-triangle"),"when weight > 0, the combination of sample.norm.type and correl.type
+                                                           dictate how the gene expression values in input.ds are transformed
+                                                           to obtain the score -- use this setting with care (the transformations
+                                                           can skew scores towards +ve or -ve values)"),
+                                                    h5(icon("thumbs-o-up"),"sample.norm.type='none' uses actual expression values; 
+                                                       combined with correl.type ='rank', genes are weighted by actual values"),
+                                                    h5(icon("thumbs-o-up"),"sample.norm.type ='rank' weights genes proportional to rank"),
+                                                    h5(icon("thumbs-o-up"),"sample.norm.type ='log' can be used for log-transforming input data"),
+                                                    h5(icon("thumbs-o-up"),"correl.type ='z.score' standardizes the (normalized) input values before using them to calculate scores")
+                                                  
+                                                        
+                                                ),
+                                                
+                                                box(status = "primary",solidHeader = FALSE,
+                                                    background = "navy", width = 6, height = "100%",
+                                                    
+                                                    selectInput(inputId = "statistic", width = "400px",
+                                                                label = "Test statistic",
+                                                                selected = "area.under.RES", 
+                                                                choices = c("Kolmogorov-Smirnov", "area.under.RES")),
+                                                    hr(),
+                                                    h6(icon("exclamation-triangle"),"ES: Enrichment Score",br(),"NES: Normalized Enrichment Score"),
+                                                    selectInput(inputId = "output.score.type", width = "400px",
+                                                                label = "Output score type",
+                                                                selected = "NES",choices = c("ES","NES")),
+                                                    sliderInput(inputId = "nperm", width = "400px",
+                                                                label = "For NES output: number of random permutations",
+                                                                min = 100, max = 1000, value = 1000),
+                                                    hr(),
+                                                    h6(icon("exclamation-triangle"),"combine.off: do not combine *_UP and *_DN versions in a single score",br(),
+                                                       "combine.replace: combine *_UP and *_DN versions in a single score",br(),
+                                                       "combine.add: combine *_UP and *_DN versions in a single score and add it but keeping the individual *_UP and *_DN versions."),
+                                                    selectInput(inputId = "combine.mode",width = "200px",
+                                                                label = "Combination Mode", selected = "combine.off",
+                                                                choices = c("combine.off", "combine.replace", "combine.add")
+                                                                ),
+                                                    hr(),
+                                                    selectInput(inputId = "correl.type", label = "Correlation type",width = "200px",
+                                                                selected = "rank", choices = c("rank", "z.score", "symm.rank")),
+                                                    hr(),
+                                                    radioButtons(inputId = "global.fdr",label = "FDR adjustment", 
+                                                                 choices = c("Calculate FDR sample-by-sample",
+                                                                             "Calculate global FDR"),
+                                                                 selected = "Calculate FDR sample-by-sample")
+                                                    
+                                                        
+                                                )
+                                                
+                                           )        
+                                               
+                                        )# End of renderUI output$mainbody
+                                        
+                
+                                        
+                
+                                        output$sidebar <- renderUI(
+                                                
+                                                sidebarMenu(id="tabitems",  
+                                                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
+                                                            
+                                                            
+                                                )#End of sidebarMenu
+                                        )# End of renderUI output$sidebar
+                
+                
+                
                 
                 
                 ##################################
@@ -220,11 +229,12 @@ server<-function(input, output, session) {
                                         
                                         ###########################
                                         #
-                                        # Re-structure UI mainbody
+                                        # Re-structure UI 
                                         #
                                         ###########################
                                         
                                         output$mainbody <- renderUI({
+                                            
                                                 fluidRow(shinyjs::useShinyjs(),
                                                 column(1,{}),         
                                                 box(title= "You are about to run ssGSEA with the selected parameters"
@@ -267,8 +277,31 @@ server<-function(input, output, session) {
                                                 column(2,{}) 
                                                 )
       
-                                         })# End of renderUI
+                                         })# End of renderUI mainbody
                                          
+                                        
+                                        output$sidebar <- renderUI(
+                                                
+                                                sidebarMenu(id="tabitems",  
+                                                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),  
+                                                            br(),br(),br(),
+                                                            # Giving the option for user to go back to parameter definition
+                                                          
+                                                             actionLink("link_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
+                                                         
+                                                            
+                                                )#End of sidebarMenu
+                                        )# End of renderUI output$sidebar 
+                                        
+                                        # Box link for back to run.GSEA
+                                        output$back.run.GSEA.box <-renderUI({
+                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
+                                                         subtitle = "Need to refine parameters?", width = 12)
+                                        })
+                                        
+                                        
+                                        
                                          observeEvent(input$run.ssGSEA,{
                                                  
                                                  #############
@@ -337,7 +370,7 @@ server<-function(input, output, session) {
                 
                 
                 
-        })# End of link_to_run.GSEA observer                   
+})# End of link_to_run.GSEA observer                   
         
         
         
