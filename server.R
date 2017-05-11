@@ -66,7 +66,7 @@ server<-function(input, output, session) {
         })
         
         # Actual observer for run.GSEA
-        observeEvent(c(input$link_to_run.GSEA), {
+        observeEvent(input$link_to_run.GSEA, {
                 global.values$task = "run.GSEA"
                 
                
@@ -280,27 +280,27 @@ server<-function(input, output, session) {
                                          })# End of renderUI mainbody
                                          
                                         
-                                        output$sidebar <- renderUI(
-                                                
-                                                sidebarMenu(id="tabitems",  
-                                                            h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),  
-                                                            br(),br(),br(),
-                                                            # Giving the option for user to go back to parameter definition
-                                                          
-                                                             actionLink("link_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
-                                                         
-                                                            
-                                                )#End of sidebarMenu
-                                        )# End of renderUI output$sidebar 
+                                         output$sidebar <- renderUI(
                                         
-                                        # Box link for back to run.GSEA
-                                        output$back.run.GSEA.box <-renderUI({
-                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
-                                                         subtitle = "Need to refine parameters?", width = 12)
-                                        })
+                                                 sidebarMenu(id="tabitems",
+                                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),
+                                                             br(),br(),br(),
+                                                             # Giving the option for user to go back to parameter definition
+                                                             # Test using tabItem structure!!!
+                                                              actionLink("link_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
                                         
                                         
+                                                 )#End of sidebarMenu
+                                         )# End of renderUI output$sidebar
+                                        
+                                         # Box link for back to run.GSEA
+                                         output$back.run.GSEA.box <-renderUI({
+                                                 valueBox(value="Back",color = "purple", icon = icon("step-backward"),
+                                                          subtitle = "Need to refine parameters?", width = 12)
+                                         })
+                                        
+
                                         
                                          observeEvent(input$run.ssGSEA,{
                                                  
