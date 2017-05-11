@@ -180,10 +180,10 @@ generate.ssGSEAheatmap <- function(sub.results.gct, cluster.rows = FALSE,
 ######################################
 
 email.to.user <- function(to,subject,body){
-        
+        to <- paste0("<",to,">")
         from <- sprintf("<ssGSEA.taskforce@\\%s>", Sys.info()[4])
-        subject <- "Hello from R"
-        body <- list("It works!", mime_part(iris))
+        subject <- subject
+        body <- list(body, mime_part('../www/BroadProteomicsLogo.png'))
         sendmail(from, to, subject, body,
                  control=list(smtpServer="ASPMX.L.GOOGLE.COM"))
 } 
