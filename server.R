@@ -212,6 +212,7 @@ server<-function(input, output, session) {
                                         statistic <- input$statistic
                                         output.score.type <- input$output.score.type
                                         nperm <- input$nperm
+                                        combine.mode <- input$combine.mode
                                         correl.type <- input$correl.type
                                         global.fdr <- input$global.fdr
                                         
@@ -240,6 +241,7 @@ server<-function(input, output, session) {
                                                 h5(icon("tags"),"Test Statistic:",column(1,{}),statistic),
                                                 h5(icon("tags"),"Type of Output Score:",column(1,{}),output.score.type),
                                                 h5(icon("tags"),"Number of Permutations:",column(1,{}),nperm),
+                                                h5(icon("tags"),"Combination mode:",column(1,{}),combine.mode),
                                                 h5(icon("tags"),"Correlation Type:",column(1,{}),correl.type),
                                                 h5(icon("tags"),"FDR Calculation mode:",column(1,{}),global.fdr)
                                         ), column(6, 
