@@ -19,7 +19,8 @@ server<-function(input, output, session) {
                                         gene.sets = NULL,
                                         features = NULL,
                                         feature = NULL,
-                                        fdr.cutoff = NULL
+                                        fdr.cutoff = NULL,
+                                        back.to.parameters = NULL
                                         )
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
@@ -70,7 +71,10 @@ server<-function(input, output, session) {
                 global.values$task = "run.GSEA"
                 
                
-                        
+                        observeEvent(global.values$back.to.parameters,{ # This is for the "back" button
+                                
+                                
+                                
                                         output$mainbody <- renderUI(
                                            fluidRow(     
                                                 box(title = "Welcome to ssGSEA run wizard!",status = "primary",
@@ -177,7 +181,7 @@ server<-function(input, output, session) {
                                                
                                         )# End of renderUI output$mainbody
                                         
-                
+                        
                                         
                 
                                         output$sidebar <- renderUI(
@@ -191,7 +195,7 @@ server<-function(input, output, session) {
                                         )# End of renderUI output$sidebar
                 
                 
-                
+                },ignoreNULL = FALSE) # End of: global.values$back.to.parameters observer        
                 
                 
                 ##################################
@@ -285,11 +289,33 @@ server<-function(input, output, session) {
                                                 )
       
                                          })# End of renderUI mainbody
-                                         
                                         
                                         
-
+                                        ######################################### 
+                                        output$sidebar <- renderUI(
+                                                
+                                                sidebarMenu(id="tabitems",  
+                                                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ), 
+                                                            br(),br(),br(),
+                                                            actionLink("link_back_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
+                                                            
+                                                )#End of sidebarMenu
+                                        )# End of renderUI output$sidebar
                                         
+                                        
+                                        # Box link for back to run.GSEA
+                                        output$back.run.GSEA.box <-renderUI({
+                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
+                                                         subtitle = "Need to refine parameters?", width = 12)
+                                        })
+                                        observeEvent(input$link_back_to_run.GSEA, {
+                                                global.values$back.to.parameters <- "back" #as.character(runif(1,0,10000))
+                                        })
+                                        
+                                        
+                                        
+                                        #########################################
                                          observeEvent(input$run.ssGSEA,{
                                                  
                                                  #############
@@ -322,15 +348,23 @@ server<-function(input, output, session) {
                                                                 email.to.user(to,subject,body)
                                                                         
                                                                 }
+                                                          
                                                                 
-                                                                # ssGSEA(input.ds = input$input.gct.ssGSEA$datapath,
-                                                                #        'Combined_.gct_Results',
-                                                                #        gene.set.databases='./c2.all.v4.0.symbols.gmt',
-                                                                #        sample.norm.type="rank",
-                                                                #        weight=0,
-                                                                #        nperm=1000,
-                                                                #        min.overlap=10,
-                                                                #        correl.type='z.score')
+                                                            parameters <- paste0("Project Name: ",output.prefix,"\n",
+                                                                            "Gene Set Database: ",gene.set.databases,"\n",
+                                                                            "Selected Gene Sets: ",gene.set.selection,"\n",
+                                                                            "Sample Normalization Type: ",sample.norm.type,"\n",
+                                                                            "Weight: ",weight,"\n",
+                                                                            "Test Statistic: ",statistic,"\n",
+                                                                            "Type of Output Score:",output.score.type,"\n",
+                                                                            "Number of Permutations: ", nperm,"\n",
+                                                                            "Combination mode: ",combine.mode,"\n",
+                                                                            "Correlation Type: ",correl.type,"\n",
+                                                                            "FDR Calculation mode: ",global.fdr,"\n")
+                                                            
+                                                            write.table(parameters, file = paste("Paremeters",user.directory,".txt"))
+                                                                
+                                                                
                                                         ssGSEA(        
                                                                 input.ds = input$input.gct.ssGSEA$datapath,                      
                                                                 output.prefix = output.prefix,                
@@ -351,7 +385,7 @@ server<-function(input, output, session) {
                                                         message(paste("Completed Job ID:",user.directory, "\n", sep = " "))
                                                         
                                                         if(nchar(user.email) != 0){
-                                                                message(paste("E-mailing your ssGSEA results to:",user.e-mail, "\n", sep = " "))
+                                                                message(paste("E-mailing your ssGSEA results to:",user.email, "\n", sep = " "))
                                                                 to <- user.email
                                                                 subject <- paste0("Your ssGSEA job: ",user.directory," is completed")
                                                                 body <- paste0("You are receiving this message because you previously started a new job in ssGSEA taskforce.\n\n Your Job ID is: ", 
@@ -379,7 +413,7 @@ server<-function(input, output, session) {
                         
                 })
                 
-                
+                 
                 
                 
 })# End of link_to_run.GSEA observer                   
