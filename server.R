@@ -20,8 +20,8 @@ server<-function(input, output, session) {
                                         features = NULL,
                                         feature = NULL,
                                         fdr.cutoff = NULL,
-                                        back.to.parameters = NULL,
-                                        actionA = NULL
+                                        back.to.parameters = NULL
+                                        
                                         )
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
@@ -301,27 +301,14 @@ server<-function(input, output, session) {
                                         
                                         
                                        
-                                        observeEvent(input$link_back_to_run.GSEA, {
-                                                
-                                                global.values$actionA <- input$link_back_to_run.GSEA
-                                                
-                                        })
+                                        # observeEvent(input$link_back_to_run.GSEA, {
+                                        #         
+                                        #         global.values$back.to.parameters <- "back"
+                                        #         
+                                        # })
                                        
                                         
-                                        observeEvent(global.values$actionA, {
-                                                
-                                                actionA <- global.values$actionA
-                                                
-                                                if(actionA == 1){
-                                                global.values$back.to.parameters <- "back"
-                                                cat("--Exit2: ",global.values$back.to.parameters,"\n")
-                                                cat("--ActionA_1: ",actionA,"\n")
-                                                }else{
-                                                global.values$back.to.parameters <- as.character(runif(1,0,10000)) 
-                                                cat("--ActionA_2: ",actionA,"\n")
-                                                }
-                                                
-                                        })
+                                       
                                         
                                         ######################################### 
                                         output$sidebar <- renderUI(
@@ -1071,7 +1058,11 @@ server<-function(input, output, session) {
         
 
         
-       
+        observeEvent(input$link_back_to_run.GSEA, {
+                
+                global.values$back.to.parameters <- as.character(runif(1,0,1000))
+                
+        })     
         
         
         
