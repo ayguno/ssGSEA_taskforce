@@ -199,10 +199,7 @@ server<-function(input, output, session) {
                                                 )#End of sidebarMenu
                                         )# End of renderUI output$sidebar
                                         
-                                        output$back.mainMenu.box <-renderUI({
-                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
-                                                         subtitle = "Back to Main Menu",width = 12)
-                                        })  
+                                          
                 
                 },ignoreNULL = FALSE) # End of: global.values$back.to.parameters observer        
                 
@@ -311,6 +308,8 @@ server<-function(input, output, session) {
                                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ), 
                                                             br(),br(),br(),
+                                                            actionLink("link_back_to_mainMenu",label = uiOutput("back.mainMenu.box")),
+                                                            br(),
                                                             actionLink("link_back_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
                                                             
                                                 )#End of sidebarMenu
@@ -321,8 +320,8 @@ server<-function(input, output, session) {
                                         # Actual observer for the randomswitch generator has to be outside of the main observers below
                                         ##############################################################################################
                                         output$back.run.GSEA.box <-renderUI({
-                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
-                                                         subtitle = "Need to refine parameters?", width = 12)
+                                                valueBox(value="",color = "purple", icon = icon("step-backward"),
+                                                         subtitle = "Back to refine parameters", width = 12)
                                         })
                                         
                                         
@@ -498,8 +497,9 @@ server<-function(input, output, session) {
                         
                         sidebarMenu(id="tabitems",  
                                     h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
-                                    
+                                    tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),        
+                                    br(),br(),
+                                    actionLink("link_back_to_mainMenu",label = uiOutput("back.mainMenu.box"))
                                     
                         )#End of sidebarMenu
                 )# End of renderUI
@@ -549,8 +549,9 @@ server<-function(input, output, session) {
                 
                 sidebarMenu(id="tabitems",  
                             h5(column(1,{}),icon("power-off"),"Powered by:"),
-                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
-                            
+                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ),        
+                            br(),br(),
+                            actionLink("link_back_to_mainMenu",label = uiOutput("back.mainMenu.box"))
                             
                 )#End of sidebarMenu
         )# End of renderUI
@@ -742,6 +743,7 @@ server<-function(input, output, session) {
                                 sidebarMenu(id="tabitems",  
                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
+                                            
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap"),
@@ -1067,9 +1069,17 @@ server<-function(input, output, session) {
         
         observeEvent(input$link_back_to_mainMenu, {
                 
+                
                 global.values$back.to.mainMenu <- as.character(runif(1,0,1000))
+                
+                
+                
                 
         }) 
         
+        output$back.mainMenu.box <-renderUI({
+                valueBox(value="",color = "maroon", icon = icon("step-backward"),
+                         subtitle = "Back to Main Menu",width = 12)
+        })
         
 }# End of server        
