@@ -197,3 +197,5 @@ email.results.to.user <- function(to,subject,message.body){
         sendmail(from, to, subject, body,
                  control=list(smtpServer="ASPMX.L.GOOGLE.COM"))
 } 
+
+

@@ -20,7 +20,8 @@ server<-function(input, output, session) {
                                         features = NULL,
                                         feature = NULL,
                                         fdr.cutoff = NULL,
-                                        back.to.parameters = NULL
+                                        back.to.parameters = NULL,
+                                        actionA = NULL
                                         )
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
@@ -297,23 +298,27 @@ server<-function(input, output, session) {
                                                          subtitle = "Need to refine parameters?", width = 12)
                                         })
                                         
-                                        if(is.null(input$link_back_to_run.GSEA)){
-                                        actionA <- input$link_back_to_run.GSEA
-                                        }
                                         
-                                        if(length(actionA) != 1){
-                                                actionB <- 2
-                                                actionA <<- 3
-                                        }
                                         
-                                        cat("--ActionA: ",actionA,"\n")
-                                        cat("--ActionB: ",actionB,"\n")
-                                        
+                                       
                                         observeEvent(input$link_back_to_run.GSEA, {
-                                                if(actionB != actionA){
-                                                global.values$back.to.parameters <- as.character(runif(1,0,10000))
+                                                
+                                                global.values$actionA <- input$link_back_to_run.GSEA
+                                                
+                                        })
+                                       
+                                        
+                                        observeEvent(global.values$actionA, {
+                                                
+                                                actionA <- global.values$actionA
+                                                
+                                                if(actionA == 1){
+                                                global.values$back.to.parameters <- "back"
                                                 cat("--Exit2: ",global.values$back.to.parameters,"\n")
-                                                actionB = actionA +1
+                                                cat("--ActionA_1: ",actionA,"\n")
+                                                }else{
+                                                global.values$back.to.parameters <- as.character(runif(1,0,10000)) 
+                                                cat("--ActionA_2: ",actionA,"\n")
                                                 }
                                                 
                                         })
