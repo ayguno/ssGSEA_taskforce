@@ -20,40 +20,43 @@ server<-function(input, output, session) {
                                         features = NULL,
                                         feature = NULL,
                                         fdr.cutoff = NULL,
-                                        back.to.parameters = NULL
-                                        
+                                        back.to.parameters = NULL,
+                                        back.to.mainMenu = NULL
                                         )
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
         
         
         ######################################################################
-        # Entry Page
+        # Entry Page (Main Menu)
         ######################################################################
         
         observe(
         if(is.null(global.values$task)){
-        output$mainbody <- renderUI(
-                box(title="Welcome to ssGSEA taskforce!",status = "primary", 
-                    background = "navy",width = 12,height = "100%",
-                    h4(column(3,{}),"Do you want to run ssGSEA or analyze existing ssGSEA results?"),
-                    column(2,{}),
-                    actionLink("link_to_run.GSEA",label = uiOutput("run.GSEA.box",width = 4)),
-                    actionLink("link_to_analyze.GSEA",label = uiOutput("analyze.GSEA.box",width = 4))
-                    )
-        )# End of renderUI
-        
-        output$sidebar <- renderUI(
                 
-                sidebarMenu(id="tabitems",  
-                            h5(column(1,{}),icon("power-off"),"Powered by:"),
-                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
-                            
-                            
-                )#End of sidebarMenu
-        )# End of renderUI
-        
-        
+                observeEvent(global.values$back.to.mainMenu,{
+                             
+                        output$mainbody <- renderUI(
+                                box(title="Welcome to ssGSEA taskforce!",status = "primary", 
+                                    background = "navy",width = 12,height = "100%",
+                                    h4(column(3,{}),"Do you want to run ssGSEA or analyze existing ssGSEA results?"),
+                                    column(2,{}),
+                                    actionLink("link_to_run.GSEA",label = uiOutput("run.GSEA.box",width = 4)),
+                                    actionLink("link_to_analyze.GSEA",label = uiOutput("analyze.GSEA.box",width = 4))
+                                    )
+                        )# End of renderUI
+                        
+                        output$sidebar <- renderUI(
+                                
+                                sidebarMenu(id="tabitems",  
+                                            h5(column(1,{}),icon("power-off"),"Powered by:"),
+                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
+                                            
+                                            
+                                )#End of sidebarMenu
+                        )# End of renderUI
+                        
+              }, ignoreNULL = FALSE)# End of global.values$back.to.mainMenu observer
         }
         )
        
@@ -189,12 +192,17 @@ server<-function(input, output, session) {
                                                 
                                                 sidebarMenu(id="tabitems",  
                                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
-                                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 )        
-                                                            
+                                                            tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ), 
+                                                            br(),br(),br(),
+                                                            actionLink("link_back_to_mainMenu",label = uiOutput("back.mainMenu.box"))
                                                             
                                                 )#End of sidebarMenu
                                         )# End of renderUI output$sidebar
-                
+                                        
+                                        output$back.mainMenu.box <-renderUI({
+                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
+                                                         subtitle = "Back to Main Menu",width = 12)
+                                        })  
                 
                 },ignoreNULL = FALSE) # End of: global.values$back.to.parameters observer        
                 
@@ -292,24 +300,10 @@ server<-function(input, output, session) {
                                          })# End of renderUI mainbody
                                         
                                         
-                                        # Box link for back to run.GSEA
-                                        output$back.run.GSEA.box <-renderUI({
-                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
-                                                         subtitle = "Need to refine parameters?", width = 12)
-                                        })
                                         
                                         
                                         
-                                       
-                                        # observeEvent(input$link_back_to_run.GSEA, {
-                                        #         
-                                        #         global.values$back.to.parameters <- "back"
-                                        #         
-                                        # })
-                                       
-                                        
-                                       
-                                        
+                                     
                                         ######################################### 
                                         output$sidebar <- renderUI(
                                                 
@@ -322,7 +316,14 @@ server<-function(input, output, session) {
                                                 )#End of sidebarMenu
                                         )# End of renderUI output$sidebar
                                         
-                                        
+                                        ##############################################################################################
+                                        # Box link for back to run.GSEA: refers to the actionlink above
+                                        # Actual observer for the randomswitch generator has to be outside of the main observers below
+                                        ##############################################################################################
+                                        output$back.run.GSEA.box <-renderUI({
+                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
+                                                         subtitle = "Need to refine parameters?", width = 12)
+                                        })
                                         
                                         
                                        
@@ -1057,14 +1058,18 @@ server<-function(input, output, session) {
         })# End of: analyze.GSEA.step2 observer
         
 
-        
+        # These random switch generators have to be outside of the main observers to work properly
         observeEvent(input$link_back_to_run.GSEA, {
                 
                 global.values$back.to.parameters <- as.character(runif(1,0,1000))
                 
         })     
         
-        
+        observeEvent(input$link_back_to_mainMenu, {
+                
+                global.values$back.to.mainMenu <- as.character(runif(1,0,1000))
+                
+        }) 
         
         
 }# End of server        
