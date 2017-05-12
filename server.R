@@ -308,8 +308,7 @@ server<-function(input, output, session) {
                                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220 ), 
                                                             br(),br(),br(),
-                                                            actionLink("link_back_to_mainMenu",label = uiOutput("back.mainMenu.box")),
-                                                            br(),
+                                                            
                                                             actionLink("link_back_to_run.GSEA",label = uiOutput("back.run.GSEA.box"))
                                                             
                                                 )#End of sidebarMenu
@@ -432,15 +431,7 @@ server<-function(input, output, session) {
         
         
         
-       
-        
-        
-        
-        
-        
-        
-        
-        
+
         
         ######################################################################
         # Task : analyze.GSEA
