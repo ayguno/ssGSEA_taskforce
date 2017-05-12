@@ -73,7 +73,7 @@ server<-function(input, output, session) {
                
                         observeEvent(global.values$back.to.parameters,{ # This is for the "back" button
                                 
-                                
+                                cat("--Entry: ",global.values$back.to.parameters,"\n")
                                 
                                         output$mainbody <- renderUI(
                                            fluidRow(     
@@ -197,7 +197,7 @@ server<-function(input, output, session) {
                 
                 },ignoreNULL = FALSE) # End of: global.values$back.to.parameters observer        
                 
-                
+                cat("--Exit1: ",global.values$back.to.parameters,"\n")
                 ##################################
                 #
                 # Actual computation for ssGSEA
@@ -291,6 +291,33 @@ server<-function(input, output, session) {
                                          })# End of renderUI mainbody
                                         
                                         
+                                        # Box link for back to run.GSEA
+                                        output$back.run.GSEA.box <-renderUI({
+                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
+                                                         subtitle = "Need to refine parameters?", width = 12)
+                                        })
+                                        
+                                        if(is.null(input$link_back_to_run.GSEA)){
+                                        actionA <- input$link_back_to_run.GSEA
+                                        }
+                                        
+                                        if(length(actionA) != 1){
+                                                actionB <- 2
+                                                actionA <<- 3
+                                        }
+                                        
+                                        cat("--ActionA: ",actionA,"\n")
+                                        cat("--ActionB: ",actionB,"\n")
+                                        
+                                        observeEvent(input$link_back_to_run.GSEA, {
+                                                if(actionB != actionA){
+                                                global.values$back.to.parameters <- as.character(runif(1,0,10000))
+                                                cat("--Exit2: ",global.values$back.to.parameters,"\n")
+                                                actionB = actionA +1
+                                                }
+                                                
+                                        })
+                                        
                                         ######################################### 
                                         output$sidebar <- renderUI(
                                                 
@@ -304,16 +331,9 @@ server<-function(input, output, session) {
                                         )# End of renderUI output$sidebar
                                         
                                         
-                                        # Box link for back to run.GSEA
-                                        output$back.run.GSEA.box <-renderUI({
-                                                valueBox(value="Back",color = "purple", icon = icon("step-backward"),
-                                                         subtitle = "Need to refine parameters?", width = 12)
-                                        })
-                                        observeEvent(input$link_back_to_run.GSEA, {
-                                                global.values$back.to.parameters <- "back" #as.character(runif(1,0,10000))
-                                        })
                                         
                                         
+                                       
                                         
                                         #########################################
                                          observeEvent(input$run.ssGSEA,{
