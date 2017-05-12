@@ -193,7 +193,7 @@ email.results.to.user <- function(to,subject,message.body){
         from <- sprintf("<ssGSEA.taskforce@\\%s>", Sys.info()[4])
         subject <- subject
         body <- list(message.body, mime_part('../www/BroadProteomicsLogo.png'),
-                     mime_part(dir()[1]),  mime_part(dir()[2]),  mime_part(dir()[3]) )
+                     mime_part(dir()[1]),  mime_part(dir()[2]),  mime_part(dir()[3]),mime_part(dir()[4]) )
         sendmail(from, to, subject, body,
                  control=list(smtpServer="ASPMX.L.GOOGLE.COM"))
 } 
