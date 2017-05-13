@@ -2,10 +2,11 @@ library(googleVis)
 library(shiny)
 library(shinydashboard)
 
-server<-function(input, output, session) {
+shinyServer(function(input, output, session) {
         
         options(shiny.maxRequestSize=30*1024^2) 
         # this would increase the upload limit to 30MB 
+        
         
         #######################################################################
         # Reactive values to store and access across a session
@@ -26,6 +27,11 @@ server<-function(input, output, session) {
         
         global.errors <- reactiveValues(analysis.step1 = NULL)
         
+        # close the R session when Chrome closes (Activate this only in the Desktop Version)
+        # session$onSessionEnded(function() { 
+        #         stopApp()
+        #         q("no") 
+        # })
         
         ######################################################################
         # Entry Page (Main Menu)
@@ -240,7 +246,7 @@ server<-function(input, output, session) {
                                         correl.type <- input$correl.type
                                         global.fdr <- input$global.fdr
                                         
-                                        user.directory <- paste(APPNAME,gsub(" |:|-","_",output.prefix),gsub(" |:|-","_",Sys.time()),sep = "_")
+                                        user.directory <- paste(gsub(" |:|-","_",output.prefix),gsub(" |:|-","_",Sys.time()),sep = "_")
                                         
                                         
                                         user.email <- input$email.address
@@ -399,7 +405,7 @@ server<-function(input, output, session) {
                                                                 message(paste("E-mailing your ssGSEA results to:",user.email, "\n", sep = " "))
                                                                 to <- user.email
                                                                 subject <- paste0("Your ssGSEA job: ",user.directory," is completed")
-                                                                body <- paste0("You are receiving this message because you previously started a new job in ssGSEA taskforce.\n\n Your Job ID is: ", 
+                                                                message.body <- paste0("You are receiving this message because you previously started a new job in ssGSEA taskforce.\n\n Your Job ID is: ", 
                                                                                user.directory,"\n\n Your job has been completed, please find your results enclosed.\n\n\n Thank you for using ssGSEA Taskforce!")
                                                                 
                                                                 email.results.to.user(to,subject,message.body)
@@ -457,10 +463,10 @@ server<-function(input, output, session) {
         observeEvent(input$link_to_analyze.GSEA, {
                 global.values$task = "analyze.GSEA"
                 output$mainbody <- renderUI(
-                        
+                     fluidRow(   
                         box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
-                            background = "navy", width = 12, height = "100%",
-                            h3("Step1: Load your data"), br(),
+                            background = "navy", width = 6, height = "100%",
+                            h3("Load your data:"), br(),
                             
                             fileInput(inputId = "input.gct",width = '400px',
                                       label = "Select to upload your input.gct file",
@@ -480,6 +486,13 @@ server<-function(input, output, session) {
                                       accept = ".gct")
                         )
                         
+                        # box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
+                        #     background = "navy", width = 6, height = "100%",
+                        #     h3("Alternatively retrieve your earlier data:"), br(),
+                        #     textInput(inputId = "ssGSEA.token", label = "Enter your ssGSEA Job ID:"),
+                        #     actionButton(inputId = "check.token",label = "Retrieve Results")
+                        # )
+                     )   
                         
                         
                 )# End of renderUI 
@@ -574,6 +587,8 @@ server<-function(input, output, session) {
                 
                 # Read results.gct and fdr.gct
                 if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) & !is.null(input$input.gct) ){ 
+                        
+           
                         
                         # First check the files to decide if they are readable        
                         line.gct <- length(readLines(input$results.gct$datapath)) 
@@ -1073,4 +1088,4 @@ server<-function(input, output, session) {
                          subtitle = "Back to Main Menu",width = 12)
         })
         
-}# End of server        
+})# End of server        
