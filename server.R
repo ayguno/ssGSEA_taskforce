@@ -90,8 +90,8 @@ shinyServer(function(input, output, session) {
                                                 box(title = "Welcome to ssGSEA run wizard!",status = "primary",
                                                     background = "navy", width = 6, height = "100%",
                                                     h4("Load your data and define parameters."),
-                                                    
                                                     h6(icon("exclamation-triangle"),"First column (Name) must contain gene symbols."),
+                                                    h6(icon("exclamation-triangle"),"Currently supporting .gct#1.2 format."),
                                                 fluidRow(
                                                 column(6,        
                                                     fileInput(inputId = "input.gct.ssGSEA",width = '200px',
@@ -103,9 +103,9 @@ shinyServer(function(input, output, session) {
                                                       )
                                                 ),  
                                                     hr(),
-                                                    h6(icon("exclamation-triangle"),"Your results can be e-mailed to you."), 
+                                                    h6(icon("exclamation-triangle"),"Your results will be e-mailed to you."), 
                                                     textInput(inputId = "email.address", width = "400px",
-                                                          label = "Provide a valid e-mail address:"),
+                                                          label = "You must provide a valid e-mail address:"),
                                                           
                                                     hr(),
                                                     textInput(inputId = "output.prefix", width = "400px",
@@ -246,7 +246,7 @@ shinyServer(function(input, output, session) {
                                         correl.type <- input$correl.type
                                         global.fdr <- input$global.fdr
                                         
-                                        user.directory <- paste(gsub(" |:|-","_",output.prefix),gsub(" |:|-","_",Sys.time()),sep = "_")
+                                        user.directory <- paste(gsub(" |:|-","_",output.prefix),gsub(" |:|-","",Sys.time()),sep = "_")
                                         
                                         
                                         user.email <- input$email.address
@@ -367,7 +367,8 @@ shinyServer(function(input, output, session) {
                                                                 }
                                                           
                                                                 
-                                                            parameters <- paste0("Project Name: ",output.prefix,"\n",
+                                                            parameters <- data.frame(parameters = paste0("ssGSEAtaskforce version ",APP.VERSION,"\n",
+                                                                            "Project Name: ",output.prefix,"\n",
                                                                             "Gene Set Database: ",gene.set.databases,"\n",
                                                                             "Selected Gene Sets: ",gene.set.selection,"\n",
                                                                             "Sample Normalization Type: ",sample.norm.type,"\n",
@@ -377,9 +378,9 @@ shinyServer(function(input, output, session) {
                                                                             "Number of Permutations: ", nperm,"\n",
                                                                             "Combination mode: ",combine.mode,"\n",
                                                                             "Correlation Type: ",correl.type,"\n",
-                                                                            "FDR Calculation mode: ",global.fdr,"\n")
+                                                                            "FDR Calculation mode: ",global.fdr,"\n"))
                                                             
-                                                            write.table(parameters, file = paste("Paremeters",user.directory,".txt"))
+                                                            write.table(parameters, file = paste("Paremeters",user.directory,".txt"), row.names = FALSE)
                                                                 
                                                                 
                                                         ssGSEA(        
@@ -421,7 +422,7 @@ shinyServer(function(input, output, session) {
                                                 }, message = "Running ssGSEA, be patient...")
                                               
                                                 setwd("../")
-                                                   
+                                                global.values$task <- NULL   
                                          })        
                                         
                                 } # end of: else line.input > 4 control

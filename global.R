@@ -4,6 +4,7 @@
 
 ## app name
 APPNAME <- sub('.*/','',getwd())
+APP.VERSION <- 0.1
 
 library(sendmailR)
 library(shinyjs)
