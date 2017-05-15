@@ -207,3 +207,19 @@ email.results.to.user <- function(to,subject,message.body){
 
 # Search for Results directory
 # Look for the dir names that contain 5 files (parameters, input, p-val, FDR, Results)
+
+
+results.lister <- function(){
+
+results.dir <- "./Results"
+dir.list <- list.dirs(path = results.dir)[-1]
+
+file.numbers <- sapply(dir.list, function(y){
+        length(list.files(y))
+})
+
+basename(names(which(file.numbers == 5)))
+
+}
+
+results.choices <- results.lister()

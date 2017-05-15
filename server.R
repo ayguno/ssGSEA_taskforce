@@ -418,6 +418,8 @@ shinyServer(function(input, output, session) {
                                                                 global.fdr          = ifelse(global.fdr == "Calculate FDR sample-by-sample", FALSE,TRUE)    
                                                         )
                                                         
+                                                        write.gct.ssgsea(input.gct, filename = "input.gct")
+                                                        
                                                         message(paste("Completed Job ID:",user.directory, "\n", sep = " "))
                                                         
                                                         if(nchar(user.email) != 0){
@@ -440,6 +442,7 @@ shinyServer(function(input, output, session) {
                                                 }, message = "Running ssGSEA, be patient...")
                                               
                                                 setwd("../../")
+                                                results.choices <<- results.lister()
                                                 global.values$task <- NULL   
                                          })        
                                         
@@ -493,7 +496,7 @@ shinyServer(function(input, output, session) {
                                          selected = "Retrieve earlier ssGSEA task results" ),
                             hr(),
                             selectInput(inputId = "ssGSEA.token", label = "Select or enter your ssGSEA Job ID:",
-                                        choices = results.choices),
+                                        choices = results.choices, multiple = FALSE),
                             actionButton(inputId = "check.token",label = "Retrieve Results")
                              ),              
                              
