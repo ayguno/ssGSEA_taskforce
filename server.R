@@ -43,13 +43,31 @@ shinyServer(function(input, output, session) {
                 observeEvent(global.values$back.to.mainMenu,{
                              
                         output$mainbody <- renderUI(
+                                
                                 box(title="Welcome to ssGSEA taskforce!",status = "primary", 
-                                    background = "navy",width = 12,height = "100%",
-                                    h4(column(3,{}),"Do you want to run ssGSEA or analyze existing ssGSEA results?"),
+                                    background = "navy",width = 11,height = "100%",
+                                    
+                                    h2(column(1,{}),"Single Sample Gene Set Enrichment Analysis Taskforce"),
+                                    
+                                    column(2,{}),
+                                    tags$img(src='ssGSEAtaskforce.jpg', height = 320, width =550 ),
+                                    br(),br(),
+                                    h4(column(3,{}),tags$strong("Do you want to run ssGSEA or analyze existing ssGSEA results?")),
+                                    br(),
                                     column(2,{}),
                                     actionLink("link_to_run.GSEA",label = uiOutput("run.GSEA.box",width = 4)),
-                                    actionLink("link_to_analyze.GSEA",label = uiOutput("analyze.GSEA.box",width = 4))
+                                    actionLink("link_to_analyze.GSEA",label = uiOutput("analyze.GSEA.box",width = 4)),
+                                    column(2,{}),
+                                    br(),br(),br(),br(),br(),br(),
+                                    h4(column(3,{}),"Designed and maintained by Ozan Aygun",icon("github"),
+                                       tags$strong(a(href="https://github.com/ayguno","Find us on GitHub!")))
                                     )
+                                
+                                    
+                                                 
+                                                 
+                               
+                                        
                         )# End of renderUI
                         
                         output$sidebar <- renderUI(
@@ -343,8 +361,8 @@ shinyServer(function(input, output, session) {
                                                  # Next step: configure e-mail interaction with user
                                                  ###################################################
 
-                                                 dir.create(paste0("./",user.directory))
-                                                 setwd(paste0("./",user.directory))
+                                                 dir.create(paste0("./Results/",user.directory))
+                                                 setwd(paste0("./Results/",user.directory))
                                                 
                                                  withProgress({
 
@@ -386,7 +404,7 @@ shinyServer(function(input, output, session) {
                                                         ssGSEA(        
                                                                 input.ds = input$input.gct.ssGSEA$datapath,                      
                                                                 output.prefix = output.prefix,                
-                                                                gene.set.databases= '../c2.all.v4.0.symbols.gmt',  
+                                                                gene.set.databases= '../../c2.all.v4.0.symbols.gmt',  
                                                                 gene.set.selection  = gene.set.selection,  
                                                                 sample.norm.type    = sample.norm.type,  
                                                                 weight              = weight,      
@@ -421,7 +439,7 @@ shinyServer(function(input, output, session) {
                                                         
                                                 }, message = "Running ssGSEA, be patient...")
                                               
-                                                setwd("../")
+                                                setwd("../../")
                                                 global.values$task <- NULL   
                                          })        
                                         
@@ -464,10 +482,24 @@ shinyServer(function(input, output, session) {
         observeEvent(input$link_to_analyze.GSEA, {
                 global.values$task = "analyze.GSEA"
                 output$mainbody <- renderUI(
-                     fluidRow(   
+                     fluidRow( 
+                             
                         box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
                             background = "navy", width = 6, height = "100%",
-                            h3("Load your data:"), br(),
+                            h3("Retrieve your earlier data:"), br(),
+                            radioButtons(inputId = "retrieve", label = "Retrieve results", 
+                                         choices = c("Retrieve earlier ssGSEA task results",
+                                                     "Load the results on the right panel."),
+                                         selected = "Retrieve earlier ssGSEA task results" ),
+                            hr(),
+                            selectInput(inputId = "ssGSEA.token", label = "Select or enter your ssGSEA Job ID:",
+                                        choices = results.choices),
+                            actionButton(inputId = "check.token",label = "Retrieve Results")
+                             ),              
+                             
+                        box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
+                            background = "navy", width = 6, height = "100%",
+                            h3("Alternatively, load your data:"), br(),
                             
                             fileInput(inputId = "input.gct",width = '400px',
                                       label = "Select to upload your input.gct file",
@@ -487,12 +519,7 @@ shinyServer(function(input, output, session) {
                                       accept = ".gct")
                         )
                         
-                        # box(title = "Welcome to ssGSEA analysis wizard!",status = "primary",
-                        #     background = "navy", width = 6, height = "100%",
-                        #     h3("Alternatively retrieve your earlier data:"), br(),
-                        #     textInput(inputId = "ssGSEA.token", label = "Enter your ssGSEA Job ID:"),
-                        #     actionButton(inputId = "check.token",label = "Retrieve Results")
-                        # )
+                        
                      )   
                         
                         

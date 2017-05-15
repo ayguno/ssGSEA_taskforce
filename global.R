@@ -184,7 +184,7 @@ email.to.user <- function(to,subject,body){
         to <- paste0("<",to,">")
         from <- sprintf("<ssGSEA.taskforce@\\%s>", Sys.info()[4])
         subject <- subject
-        body <- list(body, mime_part('../www/BroadProteomicsLogo.png'))
+        body <- list(body, mime_part('../../www/BroadProteomicsLogo.png'))
         sendmail(from, to, subject, body,
                  control=list(smtpServer="ASPMX.L.GOOGLE.COM"))
 } 
@@ -193,10 +193,17 @@ email.results.to.user <- function(to,subject,message.body){
         to <- paste0("<",to,">")
         from <- sprintf("<ssGSEA.taskforce@\\%s>", Sys.info()[4])
         subject <- subject
-        body <- list(message.body, mime_part('../www/BroadProteomicsLogo.png'),
-                     mime_part(dir()[1]),  mime_part(dir()[2]),  mime_part(dir()[3]),mime_part(dir()[4]) )
+        body <- list(message.body, mime_part('../../www/BroadProteomicsLogo.png'),
+                     mime_part(dir()[1]),  mime_part(dir()[2]),  mime_part(dir()[3]),mime_part(dir()[4]), mime_part(dir()[5]) )
         sendmail(from, to, subject, body,
                  control=list(smtpServer="ASPMX.L.GOOGLE.COM"))
 } 
 
+##############################################
+#
+# Results choices for user session retrieval
+#
+##############################################
 
+# Search for Results directory
+# Look for the dir names that contain 5 files (parameters, input, p-val, FDR, Results)
