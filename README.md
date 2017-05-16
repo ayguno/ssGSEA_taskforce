@@ -1,7 +1,7 @@
 ---
 title: "Single Sample Gene Enrichment Analysis Taskforce"
 output: 
-   
+    html_document:
       toc: true # table of content true
       depth: 3  # upto three depths of headings (specified by #, ## and ###)
       number_sections: true  ## if you want number sections at each table header
@@ -23,6 +23,10 @@ The latest version of the software is available to download from the following U
 
 
 Download the **ssGSEAtaskforce_setup.exe** file into your computer and double click to start the install wizard:
+
+<p align="center">
+<img src="Figures/Capture8.JPG" width="500">
+</p>
 
 ![](Figures/Capture8.JPG)
 
