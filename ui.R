@@ -5,8 +5,8 @@ library(shinydashboard)
 
 shinyUI( dashboardPage( skin = "red",
                       
-   dashboardHeader(title = "ssGSEA taskforce",
-                titleWidth = 300),
+   dashboardHeader(title = "ssGSEA taskforce Version 0.1",
+                titleWidth = 350),
                        
    ########################################################################
    # dashboardSidebar definition of the ui

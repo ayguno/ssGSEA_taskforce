@@ -43,14 +43,14 @@ shinyServer(function(input, output, session) {
                 observeEvent(global.values$back.to.mainMenu,{
                              
                         output$mainbody <- renderUI(
-                                
+                            fluidRow(    
                                 box(title="Welcome to ssGSEA taskforce!",status = "primary", 
                                     background = "navy",width = 11,height = "100%",
                                     
                                     h2(column(1,{}),"Single Sample Gene Set Enrichment Analysis Taskforce"),
                                     
-                                    column(2,{}),
-                                    tags$img(src='ssGSEAtaskforce.jpg', height = 320, width =550 ),
+                                    column(3,{}),
+                                    tags$img(src='ssGSEAtaskforce.jpg', height = 320, width =450 ),
                                     br(),br(),
                                     h4(column(3,{}),tags$strong("Do you want to run ssGSEA or analyze existing ssGSEA results?")),
                                     br(),
@@ -61,8 +61,18 @@ shinyServer(function(input, output, session) {
                                     br(),br(),br(),br(),br(),br(),
                                     h4(column(3,{}),"Designed and maintained by Ozan Aygun",icon("github"),
                                        tags$strong(a(href="https://github.com/ayguno","Find us on GitHub!")))
-                                    )
+                                    ),
                                 
+                                box(title="References",status = "success",collapsible = T,collapsed = T, 
+                                    background = "navy",width = 11,height = "100%",
+                                    h3("History of ssGSEA:"),
+                                    h4("GSEA algorithm was originally developed by Pablo Tamayo. ssGSEA algorithm is a modified version adapted by D.R. Mani."),
+                                    h3("Key references:"),
+                                    h4("1.Abazeed, M. E., Adams, D. J., Hurov, K. E., Tamayo, P., Creighton, C. J., Sonkin, D., et al. (2013).Integrative Radiogenomic Profiling of Squamous Cell Lung Cancer. Cancer Research, 73(20)."),
+                                    h4("2.Subramanian, A., Tamayo, P., Mootha, V. K., Mukherjee, S., Ebert, B. L., Gillette, M. A., et al. (2005),Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. Proceedings of the National Academy of Sciences of the United States of America, 102(43).")
+                                        
+                                )
+                            )    
                                     
                                                  
                                                  
@@ -109,7 +119,7 @@ shinyServer(function(input, output, session) {
                                                     background = "navy", width = 6, height = "100%",
                                                     h4("Load your data and define parameters."),
                                                     h6(icon("exclamation-triangle"),"First column (Name) must contain gene symbols."),
-                                                    h6(icon("exclamation-triangle"),"Currently supporting .gct#1.2 format."),
+                                                    h6(icon("exclamation-triangle"),"Currently supporting: .gct#1.2 format."),
                                                 fluidRow(
                                                 column(6,        
                                                     fileInput(inputId = "input.gct.ssGSEA",width = '200px',
@@ -151,7 +161,7 @@ shinyServer(function(input, output, session) {
                         
                                                 ), # End of the "Welcome to ssGSEA run wizard!" box
                                                 
-                                                box(title = "Tips for running ssGSEA:Click Here ->",status = "success",
+                                                box(title = "Tips for running ssGSEA",status = "success",
                                                     background = "navy", width = 6, height = "100%",collapsible = TRUE,
                                                     collapsed = TRUE,
                                                     
@@ -184,7 +194,7 @@ shinyServer(function(input, output, session) {
                                                                 selected = "NES",choices = c("ES","NES")),
                                                     sliderInput(inputId = "nperm", width = "400px",
                                                                 label = "For NES output: number of random permutations",
-                                                                min = 100, max = 1000, value = 1000),
+                                                                min = 100, max = 1000, value = 100),
                                                     hr(),
                                                     h6(icon("exclamation-triangle"),"combine.off: do not combine *_UP and *_DN versions in a single score",br(),
                                                        "combine.replace: combine *_UP and *_DN versions in a single score",br(),
