@@ -519,7 +519,8 @@ shinyServer(function(input, output, session) {
                             fileInput(inputId = "fdr.gct",width = '400px',
                                       label = "Select to upload your Results-fdr-pvalues.gct file",
                                       multiple = FALSE,
-                                      accept = ".gct")
+                                      accept = ".gct"),
+                            actionButton(inputId = "push.files",label = "Submit your files")
                         )
                         
                         
@@ -569,6 +570,8 @@ shinyServer(function(input, output, session) {
                                       label = "Select to upload your Results-fdr-pvalues.gct file",
                                       multiple = FALSE,
                                       accept = ".gct"),
+                            actionButton(inputId = "push.files",label = "Submit your files"),
+                            br(),
                             box(title = "Error", status = "danger",
                                 background = "navy", width = 12,height = "100%",
                                 h2("Your files are not suitable for the analysis, please correct them and reload")
@@ -614,10 +617,61 @@ shinyServer(function(input, output, session) {
         # Extract data from gene expression data set, results and fdr files
         ####################################################################
         
-        observe(
+        # Retrieve the results from earlier sessions
+        observeEvent(input$check.token,{
+                cat("--",input$check.token,"\n")
+                if(input$retrieve == "Retrieve earlier ssGSEA task results"){
+                        results.token <- input$ssGSEA.token 
+                        Position_201 <- gregexpr("_201",results.token)[[1]]
+                        token.head <- substr(results.token,1,Position_201-1)
+                                
+                        target.directory <- grep(results.token,list.dirs(path = "./Results"))
+                        target.files <- list.files(list.dirs(path = "./Results")[target.directory])
+                        
+                        input.file <- target.files[grep("input.gct", target.files)]
+                        fdr.file <- target.files[grep("fdr-pvalues.gct",target.files)]
+                        p.values.file <- target.files[grep(paste0(token.head,"-pvalues.gct"),target.files)]
+                        results.file <- target.files[grep(paste0(token.head,".gct$"),target.files)]
+                        
+                        full.directory <- paste0("./Results/",results.token,"/")
+                        
+                        input.gct <<- MSIG.Gct2Frame(filename = paste0(full.directory,input.file))$ds
+                        
+                        
+                        results.gct <<- data.frame(MSIG.Gct2Frame(filename = paste0(full.directory,results.file))$ds,
+                                                   urls= MSIG.Gct2Frame(filename = paste0(full.directory,results.file))$descs)
+                        
+                        p.values.gct <<- data.frame(MSIG.Gct2Frame(filename = paste0(full.directory,p.values.file))$ds,
+                                                    urls= MSIG.Gct2Frame(filename = paste0(full.directory,p.values.file))$descs)
+                        
+                        fdr.gct <<- data.frame(MSIG.Gct2Frame(filename = paste0(full.directory,fdr.file))$ds,
+                                               urls= MSIG.Gct2Frame(filename = paste0(full.directory,fdr.file))$descs)
+                        #Update the global if not null
+                        if(!is.null(results.gct) | !is.null(fdr.gct) | !is.null(p.values.gct) | !is.null(input.gct) ) {
+                                global.values$input.gct <- input.gct
+                                global.values$results.gct <- results.gct
+                                global.values$p.values.gct <- p.values.gct
+                                global.values$fdr.gct <- fdr.gct
+                                global.values$features <- names(results.gct)[1:(length(names(results.gct))-1)]
+                                global.values$gene.sets <-row.names(global.values$results.gct)
+                                
+                                # When files make sense, Initiate the ui change to Step2 
+                                # Move to the next step once file upload is complete
+                                global.values$task = "analyze.GSEA.step2"
+                                
+                        }
+                        
+                }
+                
+                
+        })
+        
+        
+        
+        observeEvent(input$push.files,{
                 
                 # Read results.gct and fdr.gct
-                if(!is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) & !is.null(input$input.gct) ){ 
+                if( !is.null(input$results.gct) & !is.null(input$p.values.gct) & !is.null(input$fdr.gct) & !is.null(input$input.gct) ){ 
                         
            
                         
@@ -632,7 +686,7 @@ shinyServer(function(input, output, session) {
                         }
                         else{
                                 
-                                # Work here to read expression input!!
+                                
                                 input.gct <<- data.frame(MSIG.Gct2Frame(filename = input$input.gct$datapath)$ds)
                                 
                                 
@@ -662,7 +716,7 @@ shinyServer(function(input, output, session) {
                         }
                 }
                 
-        )
+        }) # End of push.files observer
         
         
         
@@ -691,10 +745,11 @@ shinyServer(function(input, output, session) {
                                                         # analyze tab
                                                         tabItem(tabName = "analyze", class = "active",
                                                         box(title="Analyze your ssGSEA data",status = "primary", 
-                                                            background = "navy",width = 12,height = "100%",
-                                                            h3("Step2: Explore your ssGSEA data by using different tools"),
-                                                            actionLink("link_to_GSEAplot",label = uiOutput("GSEAplot.box",width = 4)),
-                                                            actionLink("link_to_GSEAheatmap",label = uiOutput("GSEAheatmap.box",width = 4))
+                                                            background = "navy",width = 10,height = "100%",
+                                                            h3(column(2,{}),"Step2: Explore your ssGSEA data by using different tools"),
+                                                            column(1,{}),
+                                                            actionLink("link_to_GSEAplot",label = uiOutput("GSEAplot.box",width = 5)),
+                                                            actionLink("link_to_GSEAheatmap",label = uiOutput("GSEAheatmap.box",width = 5))
                                                                 )
                                                         
                                                         ),# End of analyze tab
@@ -780,7 +835,9 @@ shinyServer(function(input, output, session) {
                                 sidebarMenu(id="tabitems",  
                                             h5(column(1,{}),icon("power-off"),"Powered by:"),
                                             tags$img(src='BroadProteomicsLogo.png', height = 90, width =220),
-                                            
+                                            br(),br(),
+                                            actionLink("link_back_to_mainMenu",label = uiOutput("back.mainMenu.box")),
+                                            br(),br(),br(),br(),
                                             menuItem("Analyze ssGSEA", tabName = "analyze",icon = icon("thumbs-o-up"),badgeLabel = "start here",badgeColor = "blue"),
                                             menuItem("GSEA plot", tabName = "GSEAplot"),
                                             menuItem("GSEA heatmap", tabName = "GSEAheatmap"),
@@ -798,8 +855,8 @@ shinyServer(function(input, output, session) {
                     
                         # Box link for GSEAplot
                         output$GSEAplot.box <-renderUI({
-                                valueBox(value="Generate GSEA plots",color = "blue", icon = icon("line-chart"),
-                                         subtitle = "Click here")
+                                valueBox(value="ssGSEA plots",color = "blue", icon = icon("line-chart"),
+                                         subtitle = "Click here",width = 5)
                         })
                         
                         
@@ -811,8 +868,8 @@ shinyServer(function(input, output, session) {
                         
                         # Box link for GSEAheatmap
                         output$GSEAheatmap.box <-renderUI({
-                                valueBox(value="Generate GSEA heatmaps",color = "blue", icon = icon("line-chart"),
-                                         subtitle = "Click here")
+                                valueBox(value="ssGSEA heatmaps",color = "blue", icon = icon("line-chart"),
+                                         subtitle = "Click here",width = 5)
                         })
                         
                         observeEvent(input$link_to_GSEAheatmap, {
@@ -1113,10 +1170,25 @@ shinyServer(function(input, output, session) {
                 
                 
         }) 
-        
+        #########################################################################
         output$back.mainMenu.box <-renderUI({
                 valueBox(value="",color = "maroon", icon = icon("step-backward"),
                          subtitle = "Back to Main Menu",width = 12)
+        })
+        
+        
+        observeEvent(input$retrieve,{
+                if(input$retrieve == "Retrieve earlier ssGSEA task results"){
+                        updateSelectInput(session, inputId = "ssGSEA.token",
+                                          label = "Select or enter your ssGSEA Job ID:",
+                                          choices = results.choices)
+                }else{
+                        updateSelectInput(session, inputId = "ssGSEA.token",
+                                          label = "Upload your files from the menu on the right.",
+                                          choices = "UPLOAD YOUR FILES FROM THE MENU ON THE RIGHT")
+                }       
+                
+                
         })
         
 })# End of server        
