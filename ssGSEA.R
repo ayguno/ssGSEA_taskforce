@@ -152,8 +152,8 @@ ssGSEA <- function (
   ind <- order(tab[, "Freq"], decreasing=T)
   tab <- tab[ind,]
   print(tab[1:10,])
-  print(paste("Total gene sets:", length(gs.names)))
-  print(paste("Unique gene sets:", length(unique(gs.names))))
+  message(paste("Total gene sets:", length(gs.names),"\n"))
+  message(paste("Unique gene sets:", length(unique(gs.names)),"\n"))
   
   # Loop over gene sets
   score.matrix <- matrix(0, nrow=N.gs, ncol=Ns)
@@ -161,7 +161,7 @@ ssGSEA <- function (
   for (gs.i in 1:N.gs) {
     gene.set <- gs[gs.i, 1:size.G[gs.i]]
     gene.overlap <- intersect(gene.set, gene.names)
-    print(paste(gs.i, "gene set:", gs.names[gs.i], " overlap=", length(gene.overlap)))
+    message(paste(gs.i, "gene set:", gs.names[gs.i], " overlap=", length(gene.overlap),"\n"))
     if (length(gene.overlap) < min.overlap) { 
       score.matrix[gs.i, ] <- rep(NA, Ns)
       pval.matrix[gs.i, ] <- rep(NA, Ns)
@@ -188,9 +188,9 @@ ssGSEA <- function (
   
   
   locs <- !is.na(score.matrix[,1])
-  print(paste("N.gs before overlap prunning:", N.gs))
+  message(paste("N.gs before overlap prunning:", N.gs,"\n"))
   N.gs <- sum(locs)
-  print(paste("N.gs after overlap prunning:", N.gs))
+  message(paste("N.gs after overlap prunning:", N.gs,"\n"))
   score.matrix <- score.matrix[locs,]
   pval.matrix <- pval.matrix[locs,]
   gs.names <- gs.names[locs]
@@ -232,7 +232,7 @@ ssGSEA <- function (
       temp <- strsplit(gs.names[i], split="_") 
       body <- paste(temp[[1]][seq(1, length(temp[[1]]) -1)], collapse="_")
       suffix <- tail(temp[[1]], 1)
-      print(paste("i:", i, "gene set:", gs.names[i], "body:", body, "suffix:", suffix))
+      message(paste("i:", i, "gene set:", gs.names[i], "body:", body, "suffix:", suffix,"\n"))
       if (suffix == "UP") {  # This is an "UP" gene set
         initial.up.entries <- initial.up.entries + 1
         target <- paste(body, "DN", sep="_")
@@ -290,8 +290,8 @@ ssGSEA <- function (
   ind <- order(tab[, "Freq"], decreasing=T)
   tab <- tab[ind,]
   print(tab[1:20,])
-  print(paste("Total gene sets:", length(gs.names.2)))
-  print(paste("Unique gene sets:", length(unique(gs.names.2))))
+  message(paste("Total gene sets:", length(gs.names.2),"\n"))
+  message(paste("Unique gene sets:", length(unique(gs.names.2)),"\n"))
   
   V.GCT <- data.frame(score.matrix.2)
   names(V.GCT) <- sample.names
