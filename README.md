@@ -27,6 +27,11 @@ ssGSEA taskforce is a standalone desktop software for running Single Sample Gene
 The latest version of the software is available to download from the following URL:
 
 
+[**DOWNLOAD SSGSEA Taskforce V.0.1**](https://www.dropbox.com/s/3p0mwe38hfutxwj/ssGSEAtaskforce_setup.exe?dl=0)
+
+
+___
+
 Download the **ssGSEAtaskforce_setup.exe** file into your computer and double click to start the install wizard:
 
 <p align="center">
@@ -35,7 +40,7 @@ Download the **ssGSEAtaskforce_setup.exe** file into your computer and double cl
 
 
 
-Click to **Next**.
+Click to **Next**:
 
 <p align="center">
 <img src="Figures/Capture9.JPG" width="500">
@@ -77,6 +82,26 @@ Click to **Run ssGSEA** to open ssGSEA run wizard:
 <p align="center">
 <img src="Figures/Capture6.JPG" width="600">
 </p>
+
+## Gene expression data in gct 1.2 format
+
+ssGSEA Taskforce currently supports the gct 1.2 input file format. You will be required to convert your gene expression data set into this format, which is straightforward. 
+
+Here is an intiutive example how an example file looks like:
+
+<p align="center">
+<img src="Figures/Capture14.JPG" width="600">
+</p>
+
+You can prepare your expression file in any software or programming environment you wish. The important points are:
+
+- Give unique names to your treatments (rule of thumb: avoid spaces special characters other than numbers)
+- The first two rows are reserved. The left 'corner' has the **#1.2** identifier.
+- The second row has to specify the number of Genes in your data set(number of observations) and the number of Treatments, respectively.
+- The third row will contain the header.
+- The first columns are reserved for gene names: currently supporting official human Gene Symbols, which will become the **Name** and **Description** columns, respectively. Treatment expression data should be listed afterwards.
+
+
 
 Once your parameters are ready, click to move to next stage:
 
