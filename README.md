@@ -1,14 +1,16 @@
 ---
 title: "Single Sample Gene Enrichment Analysis Taskforce"
-output: 
-    html_document:
-      toc: true # table of content true
-      depth: 3  # upto three depths of headings (specified by #, ## and ###)
-      number_sections: true  ## if you want number sections at each table header
-      theme: cerulean  #
-      highlight: tango  # specifies the syntax highlighting style
 author: "Ozan Aygun"
 date: "May 2017"
+output:
+  html_document:
+    depth: 3
+    highlight: tango
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+  pdf_document:
+    toc: yes
 ---
 
 
@@ -16,13 +18,17 @@ date: "May 2017"
 
 ssGSEA taskforce is a standalone desktop software for running Single Sample Gene Enrichment Analysis (ssGSEA) and analyzing ssGSEA results. This tutorial is intended for users who would like to quickly get started by installing the software, running ssGSEA analysis and analyzing their results.
 
+For support, bug reports and updates, please visit:
+
+https://github.com/ayguno
+
 <p align="center">
 <img src="Figures/ssGSEAtaskforce.jpg" width="300">
 </p>
 
 # Download and Software Installation
 
-**Currently available for Windows**
+**Currently only available for WINDOWS**
 
 The latest version of the software is available to download from the following URL:
 
@@ -81,7 +87,7 @@ The main menu will look like:
 
 ssGSEA Taskforce currently supports the gct 1.2 input file format. You will be required to convert your gene expression data set into this format, which is straightforward. 
 
-Here is an intuitive example how an example file looks like:
+Here is an intuitive example how a gct 1.2 file looks like:
 
 <p align="center">
 <img src="Figures/Capture14.JPG" width="600">
@@ -203,11 +209,11 @@ ssGSEA Taskforce can prepare heatmaps that are useful exploring the data sets af
 
 # Acknowledgements
 
-I would like to thank Karsten Krug for providing the source code for the sGSEAplot and D.R. Mani for adapting and providing the ssGSEA script.
+I would like to thank Karsten Krug for providing the source code for the sGSEAplot and D.R. Mani for providing the ssGSEA script.
 
 # References
 
-GSEA algorithm was originally developed by Pablo Tamayo. ssGSEA algorithm is a modified version adapted by D.R. Mani.
+GSEA algorithm was originally developed by Aravind Subramanian. ssGSEA algorithm is a modified version developed by Pablo Tamayo and modified by D.R. Mani.
 
 Key references:
 
